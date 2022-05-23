@@ -1,7 +1,7 @@
 import unittest
 
-bcd_to_str_map = "0123456789 -."
-str_to_bcd_map = {
+BCD_TO_STR_MAP = "0123456789 -."
+STR_TO_BCD_MAP = {
     "0": 0x0,
     "1": 0x1,
     "2": 0x2,
@@ -24,17 +24,17 @@ def bcd_to_str(data: bytes):
         first_code = (byte & 0b11110000) >> 4
         second_code = (byte & 0b00001111) >> 0
 
-        if first_code >= len(bcd_to_str_map):
+        if first_code >= len(BCD_TO_STR_MAP):
             raise RuntimeError(
                 f"Code {hex(first_code)} is not representable by BCD PLUS encoding"
             )
-        if second_code >= len(bcd_to_str_map):
+        if second_code >= len(BCD_TO_STR_MAP):
             raise RuntimeError(
                 f"Code {hex(second_code)} is not representable by BCD PLUS encoding"
             )
 
-        result += bcd_to_str_map[first_code]
-        result += bcd_to_str_map[second_code]
+        result += BCD_TO_STR_MAP[first_code]
+        result += BCD_TO_STR_MAP[second_code]
 
     return result.rstrip()
 
@@ -42,20 +42,20 @@ def bcd_to_str(data: bytes):
 def str_to_bcd(data: str):
     result = []
     for first, second in zip(data[::2], data[1::2]):
-        if first not in str_to_bcd_map:
+        if first not in STR_TO_BCD_MAP:
             raise RuntimeError(
                 f"Symbol '{first}' is not representable by BCD PLUS encoding"
             )
-        if second not in str_to_bcd_map:
+        if second not in STR_TO_BCD_MAP:
             raise RuntimeError(
                 f"Symbol '{second}' is not representable by BCD PLUS encoding"
             )
 
-        result.append(str_to_bcd_map[first] << 4 | str_to_bcd_map[second])
+        result.append(STR_TO_BCD_MAP[first] << 4 | STR_TO_BCD_MAP[second])
 
     if len(data) % 2 != 0:
         # Met end too early. Encode last symbol as space.
-        result.append(str_to_bcd_map[data[-1]] << 4 | 0xA)
+        result.append(STR_TO_BCD_MAP[data[-1]] << 4 | 0xA)
 
     return bytes(result)
 

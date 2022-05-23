@@ -16,7 +16,11 @@ def existing_path(path: str):
 def parse_args(placeholder: tp.Optional[tp.Any] = None):
     args = argparse.ArgumentParser()
 
-    args.add_argument("--convert", type=existing_path)
+    args.add_argument(
+        "--convert",
+        type=existing_path,
+        required=True,
+    )
     args.add_argument("--to", type=str)
 
     return args.parse_args(placeholder)

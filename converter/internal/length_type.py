@@ -13,18 +13,21 @@ class ValueType(enum.Enum):
     LanguageCodeDependent = 0b11
 
 
-VALUE_TYPE_YAML_NAMES = {
-    "binary_or_unspecified": ValueType.BinaryOrUnspecified,
-    "bcd_plus": ValueType.BCDPlus,
-    "6bit_ascii": ValueType.ASCII6bit,
-    "language_dependent": ValueType.LanguageCodeDependent,
-}
-
 YAML_NAMES_VALUE_TYPE = {
     ValueType.BinaryOrUnspecified: "binary_or_unspecified",
     ValueType.BCDPlus: "bcd_plus",
     ValueType.ASCII6bit: "6bit_ascii",
     ValueType.LanguageCodeDependent: "language_dependent",
+}
+
+
+VALUE_TYPE_YAML_NAMES = {
+    YAML_NAMES_VALUE_TYPE[ValueType.BinaryOrUnspecified]: ValueType.BinaryOrUnspecified,
+    YAML_NAMES_VALUE_TYPE[ValueType.BCDPlus]: ValueType.BCDPlus,
+    YAML_NAMES_VALUE_TYPE[ValueType.ASCII6bit]: ValueType.ASCII6bit,
+    YAML_NAMES_VALUE_TYPE[
+        ValueType.LanguageCodeDependent
+    ]: ValueType.LanguageCodeDependent,
 }
 
 

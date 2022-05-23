@@ -40,7 +40,7 @@ class ChassisType(enum.Enum):
     StickPC = enum.auto()
 
 
-value_to_chassis_type_map = [
+VALUE_TO_CHASSIS_TYPE_MAP = [
     None,
     ChassisType.Other,
     ChassisType.Unknown,
@@ -80,7 +80,7 @@ value_to_chassis_type_map = [
     ChassisType.StickPC,
 ]
 
-chassis_type_to_value_map = {
+CHASSIS_TYPE_TO_VALUE_MAP = {
     ChassisType.Other: 0x01,
     ChassisType.Unknown: 0x02,
     ChassisType.Desktop: 0x03,
@@ -119,7 +119,7 @@ chassis_type_to_value_map = {
     ChassisType.StickPC: 0x24,
 }
 
-chassis_type_to_name_map = {
+CHASSIS_TYPE_TO_NAME_MAP = {
     ChassisType.Other: "other",
     ChassisType.Unknown: "unknown",
     ChassisType.Desktop: "desktop",
@@ -158,65 +158,77 @@ chassis_type_to_name_map = {
     ChassisType.StickPC: "stickpc",
 }
 
-name_to_chassis_type_map = {
-    "other": ChassisType.Other,
-    "unknown": ChassisType.Unknown,
-    "desktop": ChassisType.Desktop,
-    "lowprofiledesktop": ChassisType.LowProfileDesktop,
-    "pizzabox": ChassisType.PizzaBox,
-    "minitower": ChassisType.MiniTower,
-    "tower": ChassisType.Tower,
-    "portable": ChassisType.Portable,
-    "laptop": ChassisType.Laptop,
-    "notebook": ChassisType.Notebook,
-    "handheld": ChassisType.HandHeld,
-    "dockingstation": ChassisType.DockingStation,
-    "allinone": ChassisType.AllInOne,
-    "subnotebook": ChassisType.SubNotebook,
-    "spacesaving": ChassisType.SpaceSaving,
-    "lunchbox": ChassisType.LunchBox,
-    "mainserverchassis": ChassisType.MainServerChassis,
-    "expansionchassis": ChassisType.ExpansionChassis,
-    "subchassis": ChassisType.SubChassis,
-    "busexpansionchassis": ChassisType.BusExpansionChassis,
-    "peripheralchassis": ChassisType.PeripheralChassis,
-    "raidchassis": ChassisType.RAIDChassis,
-    "rackmountchassis": ChassisType.RackMountChassis,
-    "sealedcasepc": ChassisType.SealedCasePC,
-    "multisystempc": ChassisType.MultiSystemPC,
-    "compactpci": ChassisType.CompactPCI,
-    "advancedtca": ChassisType.AdvancedTCA,
-    "blade": ChassisType.Blade,
-    "bladeenclosure": ChassisType.BladeEnclosure,
-    "tabled": ChassisType.Tabled,
-    "convertible": ChassisType.Convertible,
-    "detachable": ChassisType.Detachable,
-    "iotgateway": ChassisType.IoTGateway,
-    "embeddedpc": ChassisType.EmbeddedPC,
-    "minipc": ChassisType.MiniPC,
-    "stickpc": ChassisType.StickPC,
+NAME_TO_CHASSIS_TYPE_MAP = {
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.Other]: ChassisType.Other,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.Unknown]: ChassisType.Unknown,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.Desktop]: ChassisType.Desktop,
+    CHASSIS_TYPE_TO_NAME_MAP[
+        ChassisType.LowProfileDesktop
+    ]: ChassisType.LowProfileDesktop,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.PizzaBox]: ChassisType.PizzaBox,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.MiniTower]: ChassisType.MiniTower,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.Tower]: ChassisType.Tower,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.Portable]: ChassisType.Portable,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.Laptop]: ChassisType.Laptop,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.Notebook]: ChassisType.Notebook,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.HandHeld]: ChassisType.HandHeld,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.DockingStation]: ChassisType.DockingStation,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.AllInOne]: ChassisType.AllInOne,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.SubNotebook]: ChassisType.SubNotebook,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.SpaceSaving]: ChassisType.SpaceSaving,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.LunchBox]: ChassisType.LunchBox,
+    CHASSIS_TYPE_TO_NAME_MAP[
+        ChassisType.MainServerChassis
+    ]: ChassisType.MainServerChassis,
+    CHASSIS_TYPE_TO_NAME_MAP[
+        ChassisType.ExpansionChassis
+    ]: ChassisType.ExpansionChassis,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.SubChassis]: ChassisType.SubChassis,
+    CHASSIS_TYPE_TO_NAME_MAP[
+        ChassisType.BusExpansionChassis
+    ]: ChassisType.BusExpansionChassis,
+    CHASSIS_TYPE_TO_NAME_MAP[
+        ChassisType.PeripheralChassis
+    ]: ChassisType.PeripheralChassis,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.RAIDChassis]: ChassisType.RAIDChassis,
+    CHASSIS_TYPE_TO_NAME_MAP[
+        ChassisType.RackMountChassis
+    ]: ChassisType.RackMountChassis,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.SealedCasePC]: ChassisType.SealedCasePC,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.MultiSystemPC]: ChassisType.MultiSystemPC,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.CompactPCI]: ChassisType.CompactPCI,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.AdvancedTCA]: ChassisType.AdvancedTCA,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.Blade]: ChassisType.Blade,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.BladeEnclosure]: ChassisType.BladeEnclosure,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.Tabled]: ChassisType.Tabled,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.Convertible]: ChassisType.Convertible,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.Detachable]: ChassisType.Detachable,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.IoTGateway]: ChassisType.IoTGateway,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.EmbeddedPC]: ChassisType.EmbeddedPC,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.MiniPC]: ChassisType.MiniPC,
+    CHASSIS_TYPE_TO_NAME_MAP[ChassisType.StickPC]: ChassisType.StickPC,
 }
 
 
 def value_to_chassis_type(value: int) -> ChassisType:
-    if value < 1 or value > len(value_to_chassis_type_map):
+    if value < 1 or value > len(VALUE_TO_CHASSIS_TYPE_MAP):
         return None
 
-    return value_to_chassis_type_map[value]
+    return VALUE_TO_CHASSIS_TYPE_MAP[value]
 
 
 def name_to_chassis_type(name: str) -> ChassisType:
-    val = name_to_chassis_type_map.get(name)
+    val = NAME_TO_CHASSIS_TYPE_MAP.get(name)
     if val is None:
         raise RuntimeError(
-            f"Unknown chassis type '{name}'. Available values: [{', '.join(name_to_chassis_type_map.keys())}]"
+            f"Unknown chassis type '{name}'. Available values: [{', '.join(NAME_TO_CHASSIS_TYPE_MAP.keys())}]"
         )
     return val
 
 
 def chassis_type_to_name(c: ChassisType) -> str:
-    return chassis_type_to_name_map[c]
+    return CHASSIS_TYPE_TO_NAME_MAP[c]
 
 
 def chassis_type_to_value(c: ChassisType) -> int:
-    return chassis_type_to_value[c]
+    return CHASSIS_TYPE_TO_VALUE_MAP[c]

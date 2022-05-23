@@ -1,10 +1,10 @@
 import math
 import unittest
 
-ascii_6bit_map = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+ASCII_6BIT_MAP = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
 
 
-str_to_ascii_6bit_map = {
+STR_TO_ASCII_6BIT_MAP = {
     " ": 0x00,
     "!": 0x01,
     '"': 0x02,
@@ -93,11 +93,11 @@ def ascii_6bit_to_str(data: bytes):
                 (b & ((1 << (6 - (8 - bit_index))) - 1)) << (8 - bit_index)
             )
 
-        if val >= len(ascii_6bit_map):
+        if val >= len(ASCII_6BIT_MAP):
             raise RuntimeError(
                 f"ASCII 6 bit character {hex(val)} ({bin(val)}) is out of range"
             )
-        result += ascii_6bit_map[val]
+        result += ASCII_6BIT_MAP[val]
 
     return result.rstrip()
 
@@ -105,7 +105,7 @@ def ascii_6bit_to_str(data: bytes):
 def str_to_ascii_6bit(data: str) -> bytes:
     bitarray = []  # list of 1 & 0
     for symbol in data:
-        val = str_to_ascii_6bit_map.get(symbol)
+        val = STR_TO_ASCII_6BIT_MAP.get(symbol)
         if val is None:
             raise RuntimeError(
                 f"Symbol '{symbol}' can not be represented with 6bit ASCII"

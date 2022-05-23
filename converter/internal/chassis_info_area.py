@@ -2,6 +2,7 @@ import enum
 import dataclasses
 import typing as tp
 
+import converter.internal.yaml_names as yaml_names
 from converter.internal.language_codes import LanguageCode
 from converter.internal.length_type_value import LengthTypeValue
 from converter.internal.chassis_type import (
@@ -15,11 +16,6 @@ from converter.internal.errors import (
 )
 
 CHASSIS_INFO_AREA_VERSION = 0b0000_0001
-
-CHASSIS_TYPE_YAML_KEY = "chassis_type"
-PART_NUMBER_YAML_KEY = "part_number"
-SERIAL_NUMBER_YAML_KEY = "serial_number"
-CUSTOM_INFO_FIELDS_YAML_KEY = "custom_info_fields"
 
 
 @dataclasses.dataclass()
@@ -87,24 +83,30 @@ class ChassisInfoArea:
     @staticmethod
     def from_yaml(data: tp.Any) -> "ChassisInfoArea":
         mandatory_fields = [
-            CHASSIS_TYPE_YAML_KEY,
-            PART_NUMBER_YAML_KEY,
-            SERIAL_NUMBER_YAML_KEY,
-            CUSTOM_INFO_FIELDS_YAML_KEY,
+            yaml_names.CHASSIS_INFO_CHASSIS_TYPE_YAML_KEY,
+            yaml_names.CHASSIS_INFO_PART_NUMBER_YAML_KEY,
+            yaml_names.CHASSIS_INFO_SERIAL_NUMBER_YAML_KEY,
+            yaml_names.CHASSIS_INFO_CUSTOM_INFO_FIELDS_YAML_KEY,
         ]
         for field in mandatory_fields:
-            if field not in chassis_type_str:
+            if field not in data:
                 raise YamlFormatError(
                     f"Chassis Info Area has no mandatory field '{field}'"
                 )
 
         return ChassisInfoArea(
-            chassis_type=name_to_chassis_type(data[CHASSIS_TYPE_YAML_KEY]),
-            part_number=LengthTypeValue.from_yaml(data[PART_NUMBER_YAML_KEY]),
-            serial_number=LengthTypeValue.from_yaml(data[SERIAL_NUMBER_YAML_KEY]),
+            chassis_type=name_to_chassis_type(
+                data[yaml_names.CHASSIS_INFO_CHASSIS_TYPE_YAML_KEY]
+            ),
+            part_number=LengthTypeValue.from_yaml(
+                data[yaml_names.CHASSIS_INFO_PART_NUMBER_YAML_KEY]
+            ),
+            serial_number=LengthTypeValue.from_yaml(
+                data[yaml_names.CHASSIS_INFO_SERIAL_NUMBER_YAML_KEY]
+            ),
             custom_info_fields=[
                 LengthTypeValue.from_yaml(field)
-                for field in data[CUSTOM_INFO_FIELDS_YAML_KEY]
+                for field in data[yaml_names.CHASSIS_INFO_CUSTOM_INFO_FIELDS_YAML_KEY]
             ],
         )
 
