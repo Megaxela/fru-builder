@@ -125,7 +125,7 @@ class BoardInfoArea:
             yaml_names.BOARD_INFO_SERIAL_NUMBER_KEY,
             yaml_names.BOARD_INFO_PART_NUMBER_KEY,
             yaml_names.BOARD_INFO_FRU_FILE_ID_KEY,
-            yaml_names.BOARD_INFO_CUSTOM_INFO_FIELDS_YAML_KEY,
+            yaml_names.BOARD_INFO_CUSTOM_INFO_FIELDS_KEY,
         ]
         for field in mandatory_fields:
             if field not in data:
@@ -133,18 +133,22 @@ class BoardInfoArea:
                     f"Board Info Area has no mandatory field '{field}'"
                 )
 
+        # todo: validate that datetime is actually datetime
+
         return BoardInfoArea(
-            language_code=str_to_language_code(yaml_names.BOARD_INFO_LANGUAGE_CODE_KEY),
-            manufacturing_datetime=datetime.fromisoformat(
-                data[yaml_names.BOARD_INFO_MANUFACTURING_DATETIME_KEY]
+            language_code=str_to_language_code(
+                data[yaml_names.BOARD_INFO_LANGUAGE_CODE_KEY]
             ),
+            manufacturing_datetime=data[
+                yaml_names.BOARD_INFO_MANUFACTURING_DATETIME_KEY
+            ],
             manufacturer=LengthTypeValue.from_yaml(
                 data[yaml_names.BOARD_INFO_MANUFACTURER_KEY]
             ),
             product_name=LengthTypeValue.from_yaml(
                 data[yaml_names.BOARD_INFO_PRODUCT_NAME_KEY]
             ),
-            serial_nmber=LengthTypeValue.from_yaml(
+            serial_number=LengthTypeValue.from_yaml(
                 data[yaml_names.BOARD_INFO_SERIAL_NUMBER_KEY]
             ),
             part_number=LengthTypeValue.from_yaml(
@@ -155,6 +159,6 @@ class BoardInfoArea:
             ),
             custom_manufacturing_fields=[
                 LengthTypeValue.from_yaml(field)
-                for field in data[yaml_names.BOARD_INFO_CUSTOM_INFO_FIELDS_YAML_KEY]
+                for field in data[yaml_names.BOARD_INFO_CUSTOM_INFO_FIELDS_KEY]
             ],
         )

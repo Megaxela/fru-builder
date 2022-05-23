@@ -4,6 +4,7 @@ import sys
 import os
 
 import converter.binary_converter
+import converter.yaml_converter
 
 
 def existing_path(path: str):
@@ -28,15 +29,20 @@ def parse_args(placeholder: tp.Optional[tp.Any] = None):
 
 def main(args):
     binary_converter = converter.binary_converter.BinaryConverter()
+    yaml_converter = converter.yaml_converter.YamlConverter()
 
     if args.convert.endswith(".yml") or args.convert.endswith(".yaml"):
         print("Converting YAML -> BIN")
         # YML -> FRU
-        pass
+        internal_data = yaml_converter.to_internal(args.convert)
     else:
         print("Converting BIN -> YAML")
         # FRU -> YML
         internal_data = binary_converter.to_internal(args.convert)
+
+    import pprint
+
+    pprint.pprint(internal_data)
 
 
 if __name__ == "__main__":

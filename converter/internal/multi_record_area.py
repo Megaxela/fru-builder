@@ -9,9 +9,11 @@ from converter.internal.multi_record_type import (
 )
 from converter.internal.errors import (
     FruValidationError,
+    YamlFormatError,
 )
 from converter.internal.records.basic_record import BasicRecord
 from converter.internal.records.management_access_record import ManagementAccessRecord
+import converter.internal.yaml_names as yaml_names
 
 MULTIRECORD_RECORD_VERSION = 0b000_0010
 MULTIRECORD_HEADER_SIZE = 5  # bytes
@@ -52,6 +54,7 @@ class MultiRecordArea:
         while True:
             header = MultiRecordAreaRecordHeader.from_binary(data[pointer:])
 
+            # todo: throw if unknown type instead of ignoring
             cls = MULTIRECORD_TYPE_TO_RECORD.get(header.record_type_id)
             if cls is not None:
                 result.append(
@@ -72,4 +75,29 @@ class MultiRecordArea:
 
     @staticmethod
     def from_yaml(data: tp.Any) -> "MultiRecordArea":
-        pass
+        result: tp.List[BasicRecord] = []
+
+        record_mandatory_fields = [
+            yaml_names.MULTIRECORD_TYPE_KEY,
+            yaml_names.MULTIRECORD_VALUE_KEY,
+        ]
+
+        for record in data:
+            for field in record_mandatory_fields:
+                if field not in record:
+                    raise YamlFormatError(
+                        f"Multirecord area has no mandatory field '{field}'"
+                    )
+
+            record_type = str_to_multi_record_type(
+                record[yaml_names.MULTIRECORD_TYPE_KEY]
+            )
+
+            # todo: throw if unknown type instead of ignoring
+            cls = MULTIRECORD_TYPE_TO_RECORD.get(record_type)
+            if cls is not None:
+                result.append(cls.from_yaml(record[yaml_names.MULTIRECORD_VALUE_KEY]))
+
+        return MultiRecordArea(
+            records=result,
+        )

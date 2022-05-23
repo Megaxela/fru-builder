@@ -218,10 +218,11 @@ def value_to_chassis_type(value: int) -> ChassisType:
 
 
 def name_to_chassis_type(name: str) -> ChassisType:
-    val = NAME_TO_CHASSIS_TYPE_MAP.get(name)
+    lc_name = name.lower()
+    val = NAME_TO_CHASSIS_TYPE_MAP.get(lc_name)
     if val is None:
-        raise RuntimeError(
-            f"Unknown chassis type '{name}'. Available values: [{', '.join(NAME_TO_CHASSIS_TYPE_MAP.keys())}]"
+        raise ValueError(
+            f"Unknown chassis type '{lc_name}'. Available values: [{', '.join(NAME_TO_CHASSIS_TYPE_MAP.keys())}]"
         )
     return val
 

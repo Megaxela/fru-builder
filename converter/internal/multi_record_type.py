@@ -50,7 +50,12 @@ NAME_TO_MULTI_RECORD_TYPE_MAP = {
 
 def str_to_multi_record_type(name: str) -> tp.Optional[MultiRecordType]:
     lc_name = name.lower()
-    return NAME_TO_MULTI_RECORD_TYPE_MAP.get(lc_name)
+    val = NAME_TO_MULTI_RECORD_TYPE_MAP.get(lc_name)
+    if val is None:
+        raise ValueError(
+            f"Unknown multirecord type '{lc_name}'. Available values: [{', '.join(NAME_TO_MULTI_RECORD_TYPE_MAP.keys())}]"
+        )
+    return val
 
 
 def multi_record_type_to_str(t: MultiRecordType) -> str:
