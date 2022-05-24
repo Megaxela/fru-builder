@@ -15,5 +15,13 @@ class YamlConverter(BasicConverter):
 
         return FruData.from_yaml(data)
 
-    def from_internal(self, path: str, internal_data: FruData):
-        pass
+    def from_internal(self, path: tp.Optional[str], internal_data: FruData):
+        str_yaml = yaml.dump(
+            internal_data.to_yaml(),
+            sort_keys=False,
+        )
+        if path:
+            with open(path, "w") as f:
+                f.write(str_yaml)
+        else:
+            print(str_yaml)

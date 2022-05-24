@@ -15,4 +15,5 @@ class BinaryConverter(BasicConverter):
         return FruData.from_binary(data)
 
     def from_internal(self, path: str, internal_data: FruData):
-        pass
+        with open(path, "wb") as f:
+            f.write(internal_data.to_binary())

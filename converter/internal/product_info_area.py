@@ -7,14 +7,18 @@ from converter.internal.language_codes import (
     LanguageCode,
     index_to_language_code,
     str_to_language_code,
+    language_code_to_str,
+    language_code_to_index,
 )
 from converter.internal.length_type_value import LengthTypeValue
+from converter.internal.checksum import calculate_checksum
 from converter.internal.errors import (
     FruValidationError,
     YamlFormatError,
 )
 
 PRODUCT_INFO_AREA_VERSION = 0b0000_0001
+MAX_AREA_SIZE = 255
 
 
 @dataclasses.dataclass()
@@ -28,6 +32,100 @@ class ProductInfoArea:
     asset_tag: LengthTypeValue
     fru_file_id: LengthTypeValue
     custom_info_fields: tp.List[LengthTypeValue]
+
+    def to_binary(self) -> bytes:
+        result = bytearray()
+
+        # 1 byte of product info area version
+        result.append(PRODUCT_INFO_AREA_VERSION)
+
+        # 1 byte of product info area version
+        total_length = sum(
+            (
+                1,  # Product area format version
+                1,  # Product area length
+                1,  # Language code
+                self.manufacturer_name.get_size(self.language_code),
+                self.product_name.get_size(self.language_code),
+                self.part_number.get_size(self.language_code),
+                self.product_version.get_size(self.language_code),
+                self.serial_number.get_size(LanguageCode.English),
+                self.asset_tag.get_size(self.language_code),
+                self.fru_file_id.get_size(self.language_code),
+                sum(
+                    (
+                        field.get_size(self.language_code)
+                        for field in self.custom_info_fields
+                    )
+                ),
+                1,  # 0xC1 - no more fields
+                1,  # Checksum
+            )
+        )
+        aligned_length = total_length + (8 - (total_length % 8))
+
+        if aligned_length > MAX_AREA_SIZE:
+            raise FruValidationError(
+                f"Total Product Info Area size {aligned_length} > {MAX_AREA_SIZE}"
+            )
+
+        result.append(aligned_length // 8)
+
+        # 1 byte language code
+        result.append(language_code_to_index(self.language_code))
+
+        # 1 + N bytes of manufacturer name
+        result += self.manufacturer_name.to_binary(self.language_code)
+
+        # 1 + M bytes of product name
+        result += self.product_name.to_binary(self.language_code)
+
+        # 1 + O bytes of product part/model number
+        result += self.part_number.to_binary(self.language_code)
+
+        # 1 + R bytes of product version
+        result += self.product_version.to_binary(self.language_code)
+
+        # 1 + P bytes of serial number
+        result += self.serial_number.to_binary(LanguageCode.English)
+
+        # 1 + Q bytes of asset tag
+        result += self.asset_tag.to_binary(self.language_code)
+
+        # 1 + R bytes of fru file id
+        result += self.fru_file_id.to_binary(self.language_code)
+
+        # Custom fields
+        for field in self.custom_info_fields:
+            result += field.to_binary(self.language_code)
+
+        # No more fields
+        result.append(0xC1)
+
+        # Add zeroes
+        result += bytes([0x00]) * (aligned_length - total_length)
+
+        # Add checksum
+        result.append(calculate_checksum(result))
+
+        return bytes(result)
+
+    def to_yaml(self) -> tp.Any:
+        return {
+            yaml_names.PRODUCT_INFO_LANGUAGE_CODE_KEY: language_code_to_str(
+                self.language_code
+            ),
+            yaml_names.PRODUCT_INFO_MANUFACTURER_NAME_KEY: self.manufacturer_name.to_yaml(),
+            yaml_names.PRODUCT_INFO_PRODUCT_NAME_KEY: self.product_name.to_yaml(),
+            yaml_names.PRODUCT_INFO_PART_NUMBER_KEY: self.part_number.to_yaml(),
+            yaml_names.PRODUCT_INFO_PRODUCT_VERSION_KEY: self.product_version.to_yaml(),
+            yaml_names.PRODUCT_INFO_SERIAL_NUMBER_KEY: self.serial_number.to_yaml(),
+            yaml_names.PRODUCT_INFO_ASSET_TAG_KEY: self.asset_tag.to_yaml(),
+            yaml_names.PRODUCT_INFO_FRU_FILE_ID_KEY: self.fru_file_id.to_yaml(),
+            yaml_names.PRODUCT_INFO_CUSTOM_INFO_FIELDS_KEY: [
+                field.to_yaml() for field in self.custom_info_fields
+            ],
+        }
 
     @staticmethod
     def from_binary(data: bytes) -> "ProductInfoArea":

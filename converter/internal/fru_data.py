@@ -6,10 +6,17 @@ from converter.internal.chassis_info_area import ChassisInfoArea
 from converter.internal.board_info_area import BoardInfoArea
 from converter.internal.product_info_area import ProductInfoArea
 from converter.internal.multi_record_area import MultiRecordArea
-from converter.internal.errors import YamlFormatError
+from converter.internal.checksum import calculate_checksum
+from converter.internal.errors import (
+    YamlFormatError,
+    FruValidationError,
+)
 import converter.internal.yaml_names as yaml_names
 
-OFFSET_MUL = 8
+OFFSET_MUL = 8  # bytes
+
+FRU_FORMAT_VERSION = 0b0000_0001
+COMMON_HEADER_SIZE = 8  # bytes
 
 
 class CommonHeaderStructure(ctypes.Structure):
@@ -32,10 +39,66 @@ class FruData:
     product_info: tp.Optional[ProductInfoArea]
     multirecord_area: tp.Optional[MultiRecordArea]
 
+    def to_binary(self) -> bytes:
+        result = bytearray()
+
+        def serialize(result, area) -> int:
+            if area is not None:
+                data = area.to_binary()
+                if data is not None:
+                    offset = len(result) + COMMON_HEADER_SIZE
+                    result += data
+                    return offset // OFFSET_MUL
+            return 0
+
+        # todo: add internal use area serialization
+        chassis_info_offset = serialize(result, self.chassis_info)
+        board_info_offset = serialize(result, self.board_info)
+        product_info_offset = serialize(result, self.product_info)
+        multirecord_offset = serialize(result, self.multirecord_area)
+
+        common_header = CommonHeaderStructure(
+            format_version=FRU_FORMAT_VERSION,
+            internal_use_area_starting_offset=0,
+            chassis_info_area_starting_offset=chassis_info_offset,
+            board_area_starting_offset=board_info_offset,
+            product_info_area_starting_offset=product_info_offset,
+            multirecord_area_starting_offset=multirecord_offset,
+            pad=0,
+            header_checksum=0,
+        )
+
+        common_header.header_checksum = calculate_checksum(bytes(common_header))
+
+        return bytes(bytearray(common_header) + result)
+
+    def to_yaml(self) -> tp.Any:
+        result = {}
+
+        def parse(field, name):
+            if field is not None:
+                result[name] = field.to_yaml()
+            else:
+                result[name] = None
+
+        parse(self.chassis_info, yaml_names.AREA_CHASSIS_INFO_KEY)
+        parse(self.board_info, yaml_names.AREA_BOARD_INFO_KEY)
+        parse(self.product_info, yaml_names.AREA_PRODUCT_INFO_KEY)
+        parse(self.multirecord_area, yaml_names.AREA_MULTIRECORD_KEY)
+
+        # todo: move global key to yaml converter
+        return {yaml_names.ROOT_AREAS_KEY: result}
+
     @staticmethod
     def from_binary(data: bytes) -> "FruData":
         # Parsing common header
         common_header = CommonHeaderStructure.from_buffer_copy(data, 0)
+
+        format_version = common_header.format_version & 0b0000_1111
+        if format_version != FRU_FORMAT_VERSION:
+            raise FruValidationError(
+                f"Fru format version '{format_version}' != '{FRU_FORMAT_VERSION}'"
+            )
 
         # todo: add internal use area parsing
 

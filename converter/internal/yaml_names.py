@@ -7,6 +7,10 @@ COMMON_FRU_FILE_ID = "fru_file_id"
 # Root
 ROOT_AREAS_KEY = "areas"
 
+# Length Type
+LENGTH_TYPE_TYPE_KEY = "type"
+LENGTH_TYPE_VALUE_KEY = "value"
+
 # Areas
 AREA_CHASSIS_INFO_KEY = "chassis_info_area"
 AREA_BOARD_INFO_KEY = "board_info_area"

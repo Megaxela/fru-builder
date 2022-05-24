@@ -32,17 +32,20 @@ def main(args):
     yaml_converter = converter.yaml_converter.YamlConverter()
 
     if args.convert.endswith(".yml") or args.convert.endswith(".yaml"):
-        print("Converting YAML -> BIN")
+        if args.to:
+            print("Converting YAML -> BIN")
         # YML -> FRU
         internal_data = yaml_converter.to_internal(args.convert)
+        import pprint
+
+        pprint.pprint(internal_data)
+        binary_converter.from_internal(args.to, internal_data)
     else:
-        print("Converting BIN -> YAML")
+        if args.to:
+            print("Converting BIN -> YAML")
         # FRU -> YML
         internal_data = binary_converter.to_internal(args.convert)
-
-    import pprint
-
-    pprint.pprint(internal_data)
+        yaml_converter.from_internal(args.to, internal_data)
 
 
 if __name__ == "__main__":

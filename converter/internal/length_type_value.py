@@ -8,9 +8,7 @@ from converter.internal.bcd import bcd_to_str, str_to_bcd
 from converter.internal.ascii_6bit import ascii_6bit_to_str, str_to_ascii_6bit
 from converter.internal.language_codes import LanguageCode
 from converter.internal.errors import YamlFormatError, BinaryConversionError
-
-VALUE_KEY = "value"
-TYPE_KEY = "type"
+import converter.internal.yaml_names as yaml_names
 
 
 class ParseHint(enum.Enum):
@@ -42,9 +40,15 @@ class LengthTypeValue:
     length_type: LengthType
     value: tp.Optional[tp.Union[str, bytes]]
 
+    def get_size(self, language_code: tp.Optional[LanguageCode] = None) -> int:
+        return len(self.to_binary(language_code))
+
     def to_binary(self, language_code: tp.Optional[LanguageCode] = None) -> bytes:
         if language_code is None:
             language_code = LanguageCode.English
+
+        if self.value is None:
+            return bytes()
 
         # Converting value to bytes
         converted_value = None
@@ -82,26 +86,28 @@ class LengthTypeValue:
 
     def to_yaml(self) -> tp.Any:
         return {
-            TYPE_KEY: self.length_type.to_yaml(),
-            VALUE_KEY: value_to_yaml(self.value),
+            yaml_names.LENGTH_TYPE_TYPE_KEY: self.length_type.to_yaml(),
+            yaml_names.LENGTH_TYPE_VALUE_KEY: value_to_yaml(self.value),
         }
 
     @staticmethod
     def from_yaml(data: tp.Any):
-        if VALUE_KEY not in data:
+        if yaml_names.LENGTH_TYPE_VALUE_KEY not in data:
             raise YamlFormatError(
-                f"There is no '{VALUE_KEY}' key in length/type value field"
+                f"There is no '{yaml_names.LENGTH_TYPE_VALUE_KEY}' key in length/type value field"
             )
 
-        type_str = data.get(TYPE_KEY)
+        type_str = data.get(yaml_names.LENGTH_TYPE_TYPE_KEY)
         if type_str is None:
-            raise YamlFormatError(f"No '{TYPE_KEY}' key in type/length value field")
+            raise YamlFormatError(
+                f"No '{yaml_names.LENGTH_TYPE_TYPE_KEY}' key in type/length value field"
+            )
 
         lt = LengthType.from_yaml(type_str)
         return LengthTypeValue(
             length_type=lt,
             value=parse_value(
-                data[VALUE_KEY],
+                data[yaml_names.LENGTH_TYPE_VALUE_KEY],
                 ParseHint.ByteArray
                 if lt.type == ValueType.BinaryOrUnspecified
                 else None,

@@ -4,7 +4,8 @@ import typing as tp
 
 from converter.internal.records.basic_record import BasicRecord
 import converter.internal.yaml_names as yaml_names
-from converter.internal.length_type_value import parse_value
+from converter.internal.length_type_value import parse_value, value_to_yaml
+from converter.internal.multi_record_type import MultiRecordType
 
 
 class ManagementAccessRecordType(enum.Enum):
@@ -53,11 +54,11 @@ STRING_TO_MANAGEMENT_ACCESS_RECORD_TYPE = {
 
 
 def bound_check(start, end):
-    def check(_, length):
-        if not start <= (length + 1) <= end:
-            raise ValueError(
-                f"Value length {length} is out of range [{start - 1}, {end - 1}]"
-            )
+    def check(value):
+        length = len(value)
+        if not start <= length <= end:
+            raise ValueError(f"Value length {length} is out of range [{start}, {end}]")
+        return value
 
     return check
 
@@ -81,6 +82,29 @@ class ManagementAccessRecord(BasicRecord):
     sub_type: ManagementAccessRecordType
     data: bytes
 
+    @property
+    def record_type(self):
+        return MultiRecordType.ManagementAccessRecord
+
+    def to_binary(self) -> bytes:
+        result = bytearray()
+
+        # 1 byte sub-record type
+        result.append(self.sub_type.value)
+
+        # N bytes data
+        result += self.data
+
+        return bytes(result)
+
+    def to_yaml(self):
+        return {
+            yaml_names.MANAGEMENT_ACCESS_RECORD_SUB_TYPE_KEY: MANAGEMENT_ACCESS_RECORD_TYPE_TO_STRING[
+                self.sub_type
+            ],
+            yaml_names.MANAGEMENT_ACCESS_RECORD_VALUE_KEY: value_to_yaml(self.data),
+        }
+
     def from_binary(data: bytes) -> "ManagementAccessRecord":
         return ManagementAccessRecord(
             sub_type=ManagementAccessRecordType(data[0]),
@@ -88,9 +112,12 @@ class ManagementAccessRecord(BasicRecord):
         )
 
     def from_yaml(data: tp.Any) -> "ManagementAccessRecord":
+        sub_type = STRING_TO_MANAGEMENT_ACCESS_RECORD_TYPE.get(
+            data[yaml_names.MANAGEMENT_ACCESS_RECORD_SUB_TYPE_KEY]
+        )
         return ManagementAccessRecord(
-            sub_type=STRING_TO_MANAGEMENT_ACCESS_RECORD_TYPE.get(
-                data[yaml_names.MANAGEMENT_ACCESS_RECORD_SUB_TYPE_KEY]
+            sub_type=sub_type,
+            data=VALUE_VALIDATORS[sub_type](
+                parse_value(data[yaml_names.MANAGEMENT_ACCESS_RECORD_VALUE_KEY])
             ),
-            data=parse_value(data[yaml_names.MANAGEMENT_ACCESS_RECORD_VALUE_KEY]),
         )

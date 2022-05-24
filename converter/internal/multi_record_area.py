@@ -6,6 +6,8 @@ from converter.internal.multi_record_type import (
     MultiRecordType,
     str_to_multi_record_type,
     index_to_multi_record_type,
+    multi_record_type_to_str,
+    multi_record_type_to_index,
 )
 from converter.internal.errors import (
     FruValidationError,
@@ -13,8 +15,10 @@ from converter.internal.errors import (
 )
 from converter.internal.records.basic_record import BasicRecord
 from converter.internal.records.management_access_record import ManagementAccessRecord
+from converter.internal.checksum import calculate_checksum
 import converter.internal.yaml_names as yaml_names
 
+MAX_RECORD_LENGTH = 255
 MULTIRECORD_RECORD_VERSION = 0b000_0010
 MULTIRECORD_HEADER_SIZE = 5  # bytes
 MULTIRECORD_TYPE_TO_RECORD = {
@@ -27,6 +31,29 @@ class MultiRecordAreaRecordHeader:
     record_type_id: MultiRecordType
     end_of_list: bool
     record_length: int
+    record_checksum: int
+
+    def to_binary(self) -> bytes:
+        result = bytearray()
+
+        # 1 byte of record type id
+        result.append(multi_record_type_to_index(self.record_type_id))
+
+        # 1 byte of record length
+        if self.record_length > MAX_RECORD_LENGTH:
+            raise FruValidationError(
+                f"MultiRecord record size {self.record_length} > {MAX_RECORD_LENGTH}"
+            )
+
+        result.append(self.record_length)
+
+        # 1 record checksum
+        result.append(self.record_checksum)
+
+        # 1 header checksum
+        result.append(calculate_checksum(result))
+
+        return bytes(result)
 
     @staticmethod
     def from_binary(data: bytes) -> "MultiRecordAreaRecordHeader":
@@ -40,12 +67,47 @@ class MultiRecordAreaRecordHeader:
             record_type_id=index_to_multi_record_type(data[0]),
             end_of_list=(data[1] & 0b1000_0000) != 0,
             record_length=data[2],
+            record_checksum=data[3],
         )
 
 
 @dataclasses.dataclass()
 class MultiRecordArea:
     records: tp.List[BasicRecord]
+
+    def to_binary(self) -> tp.Optional[bytes]:
+        if not self.records:
+            return None
+
+        result = bytearray()
+
+        for index, record in enumerate(self.records):
+            record_data = record.to_binary()
+
+            result += MultiRecordAreaRecordHeader(
+                record_type_id=record.record_type,
+                end_of_list=(index == len(self.records) - 1),
+                record_length=len(record_data),
+                record_checksum=calculate_checksum(record_data),
+            ).to_binary()
+            result += record_data
+
+        return bytes(result)
+
+    def to_yaml(self) -> tp.List[tp.Any]:
+        result = []
+
+        for record in self.records:
+            result.append(
+                {
+                    yaml_names.MULTIRECORD_TYPE_KEY: multi_record_type_to_str(
+                        record.record_type
+                    ),
+                    yaml_names.MULTIRECORD_VALUE_KEY: record.to_yaml(),
+                }
+            )
+
+        return result
 
     @staticmethod
     def from_binary(data: bytes) -> "MultiRecordArea":
