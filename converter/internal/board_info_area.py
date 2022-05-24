@@ -81,9 +81,14 @@ class BoardInfoArea:
 
         if self.manufacturing_datetime is not None:
             minutes = (
-                self.manufacturing_datetime - MANUFACTURING_START_DATE
-            ).seconds // 60
-            result += int.to_bytes(minutes, 3, byteorder="big", signed=False)
+                int(
+                    (
+                        self.manufacturing_datetime - MANUFACTURING_START_DATE
+                    ).total_seconds()
+                )
+                // 60
+            )
+            result += int.to_bytes(minutes, 3, byteorder="little", signed=False)
         else:
             result += bytes([0x00, 0x00, 0x00])
 
@@ -164,7 +169,7 @@ class BoardInfoArea:
         manufacturing_datetime = None
         if data[pointer : pointer + 3] != b"\x00\x00\x00":
             # Minutes since 0:00 01-01-1996
-            minutes = int.from_bytes(data[pointer : pointer + 3], byteorder="big")
+            minutes = int.from_bytes(data[pointer : pointer + 3], byteorder="little")
             manufacturing_datetime = MANUFACTURING_START_DATE + datetime.timedelta(
                 minutes=minutes
             )

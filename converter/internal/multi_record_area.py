@@ -19,7 +19,7 @@ from converter.internal.checksum import calculate_checksum
 import converter.internal.yaml_names as yaml_names
 
 MAX_RECORD_LENGTH = 255
-MULTIRECORD_RECORD_VERSION = 0b000_0010
+MULTIRECORD_RECORD_VERSION = 0b0010
 MULTIRECORD_HEADER_SIZE = 5  # bytes
 MULTIRECORD_TYPE_TO_RECORD = {
     MultiRecordType.ManagementAccessRecord: ManagementAccessRecord,
@@ -38,6 +38,12 @@ class MultiRecordAreaRecordHeader:
 
         # 1 byte of record type id
         result.append(multi_record_type_to_index(self.record_type_id))
+
+        # 1 byte of bitfield
+        bitfield = MULTIRECORD_RECORD_VERSION
+        if self.end_of_list:
+            bitfield |= 0b1000_0000
+        result.append(bitfield)
 
         # 1 byte of record length
         if self.record_length > MAX_RECORD_LENGTH:
@@ -92,6 +98,10 @@ class MultiRecordArea:
             ).to_binary()
             result += record_data
 
+        total_length = len(result)
+
+        result += bytes([0x00]) * (8 - (total_length % 8))
+
         return bytes(result)
 
     def to_yaml(self) -> tp.List[tp.Any]:
@@ -122,7 +132,9 @@ class MultiRecordArea:
                 result.append(
                     cls.from_binary(
                         data[
-                            MULTIRECORD_HEADER_SIZE : MULTIRECORD_HEADER_SIZE
+                            pointer
+                            + MULTIRECORD_HEADER_SIZE : pointer
+                            + MULTIRECORD_HEADER_SIZE
                             + header.record_length
                         ]
                     )

@@ -108,7 +108,7 @@ def str_to_ascii_6bit(data: str) -> bytes:
         val = STR_TO_ASCII_6BIT_MAP.get(symbol)
         if val is None:
             raise RuntimeError(
-                f"Symbol '{symbol}' can not be represented with 6bit ASCII"
+                f"Symbol '{symbol}' from '{data}' can not be represented with 6bit ASCII"
             )
 
         for i in range(6):

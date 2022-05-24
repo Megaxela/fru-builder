@@ -44,11 +44,11 @@ def str_to_bcd(data: str):
     for first, second in zip(data[::2], data[1::2]):
         if first not in STR_TO_BCD_MAP:
             raise RuntimeError(
-                f"Symbol '{first}' is not representable by BCD PLUS encoding"
+                f"Symbol '{first}' from '{data}' is not representable by BCD PLUS encoding"
             )
         if second not in STR_TO_BCD_MAP:
             raise RuntimeError(
-                f"Symbol '{second}' is not representable by BCD PLUS encoding"
+                f"Symbol '{second}' from '{data}' is not representable by BCD PLUS encoding"
             )
 
         result.append(STR_TO_BCD_MAP[first] << 4 | STR_TO_BCD_MAP[second])

@@ -6,6 +6,7 @@ from converter.internal.records.basic_record import BasicRecord
 import converter.internal.yaml_names as yaml_names
 from converter.internal.length_type_value import parse_value, value_to_yaml
 from converter.internal.multi_record_type import MultiRecordType
+from converter.internal.errors import BinaryConversionError
 
 
 class ManagementAccessRecordType(enum.Enum):
@@ -80,7 +81,7 @@ VALUE_VALIDATORS = {
 @dataclasses.dataclass()
 class ManagementAccessRecord(BasicRecord):
     sub_type: ManagementAccessRecordType
-    data: bytes
+    data: tp.Union[bytes, str]
 
     @property
     def record_type(self):
@@ -93,7 +94,15 @@ class ManagementAccessRecord(BasicRecord):
         result.append(self.sub_type.value)
 
         # N bytes data
-        result += self.data
+        if isinstance(self.data, str):
+            try:
+                result += self.data.encode("latin-1")
+            except UnicodeEncodeError as e:
+                raise BinaryConversionError(
+                    f"Unable to convert '{self.data}' to latin-1: {e}"
+                )
+        elif isinstance(self.data, bytes):
+            result += self.data
 
         return bytes(result)
 
@@ -106,10 +115,20 @@ class ManagementAccessRecord(BasicRecord):
         }
 
     def from_binary(data: bytes) -> "ManagementAccessRecord":
-        return ManagementAccessRecord(
-            sub_type=ManagementAccessRecordType(data[0]),
-            data=data[1:],
-        )
+        sub_type = ManagementAccessRecordType(data[0])
+
+        value = data[1:]
+        if sub_type == ManagementAccessRecordType.SystemUniqueID:
+            value = " ".join(map(lambda x: f"{x:02x}", value))
+        else:
+            # Try to parse it as latin-1 string.
+            # If failed - just let it be binary.
+            try:
+                value = value.decode("latin-1")
+            except UnicodeDecodeError:
+                pass
+
+        return ManagementAccessRecord(sub_type=sub_type, data=value)
 
     def from_yaml(data: tp.Any) -> "ManagementAccessRecord":
         sub_type = STRING_TO_MANAGEMENT_ACCESS_RECORD_TYPE.get(

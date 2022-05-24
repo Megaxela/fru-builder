@@ -48,7 +48,8 @@ class LengthTypeValue:
             language_code = LanguageCode.English
 
         if self.value is None:
-            return bytes()
+            self.length_type.number_of_data_bytes = 0
+            return bytes([self.length_type.to_binary()])
 
         # Converting value to bytes
         converted_value = None
@@ -74,9 +75,19 @@ class LengthTypeValue:
                 raise BinaryConversionError("Language Dependent value should be string")
 
             if language_code == LanguageCode.English:
-                converted_value = self.value.encode("latin-1")
+                try:
+                    converted_value = self.value.encode("latin-1")
+                except UnicodeEncodeError as e:
+                    raise BinaryConversionError(
+                        f"Unable to convert '{self.value}' to latin-1 (language code: {language_code}): {e}"
+                    )
             else:
-                converted_value = self.value.encode("utf-16be")
+                try:
+                    converted_value = self.value.encode("utf-16be")
+                except UnicodeEncodeError as e:
+                    raise BinaryConversionError(
+                        f"Unable to convert '{self.value}' to utf-16 (language code: {language_code}): {e}"
+                    )
 
         # Bumping number of data bytes
         self.length_type.number_of_data_bytes = len(converted_value)

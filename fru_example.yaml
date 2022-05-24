@@ -17,20 +17,20 @@ areas:
       value: 123.324-123 234-123 # `0123456789 -.` only allowed
 
     - type: 6bit_ascii
-      value: hello_world # wtf??
+      value: HELLO_WORLD 
 
     - type: language_dependent
-      value: привет # help me (illegal, cause chassis_info_area is always english lang code)
+      value: some_english # it's illegal to use here anything, that can't be encoded with latin-1
 
   board_info_area:
     language_code: pl # or Polish
     manufacturing_datetime: 2022-04-25 18:34:04 # ISO Format
     manufacturer_name:
-      type: 6bit_ascii
+      type: language_dependent
       value: DeltaComputers
         
     product_name:
-      type: 6bit_ascii
+      type: language_dependent
       value: SomeCoolBoardProduct
         
     serial_number:
@@ -50,15 +50,15 @@ areas:
   product_info_area:
     language_code: Russian # or ru
     manufacturer_name:
-      type: 6bit_ascii
+      type: language_dependent
       value: DeltaComputers
         
     product_name:
-      type: 6bit_ascii
+      type: language_dependent
       value: SomeCoolProduct
         
     product_version:
-      type: 6bit_ascii
+      type: language_dependent
       value: CoolVersion
         
     part_number:
@@ -70,7 +70,7 @@ areas:
       value: SOME_PRODUCT_SERIALNUMBER
 
     asset_tag:
-      type: 6bit_ascii
+      type: language_dependent
       value: SomeAssetTag
       
     fru_file_id:

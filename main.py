@@ -36,9 +36,6 @@ def main(args):
             print("Converting YAML -> BIN")
         # YML -> FRU
         internal_data = yaml_converter.to_internal(args.convert)
-        import pprint
-
-        pprint.pprint(internal_data)
         binary_converter.from_internal(args.to, internal_data)
     else:
         if args.to:

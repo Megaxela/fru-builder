@@ -3,6 +3,7 @@ import yaml
 
 from .basic_converter import BasicConverter
 from .internal.fru_data import FruData
+from .internal.errors import YamlFormatError
 
 
 class YamlConverter(BasicConverter):
@@ -12,6 +13,9 @@ class YamlConverter(BasicConverter):
     def to_internal(self, path: str) -> FruData:
         with open(path, "rb") as f:
             data = yaml.load(f, Loader=yaml.FullLoader)
+
+        if data is None:
+            raise YamlFormatError(f"Provided file is empty")
 
         return FruData.from_yaml(data)
 
