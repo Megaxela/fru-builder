@@ -17,6 +17,10 @@ class ParseHint(enum.Enum):
 
 def parse_value(data: str, hint: ParseHint = None):
     def parse_as_bytearray():
+        v = data.lower().split(" ")
+        if len(v) == 0 or max(*list(map(lambda x: len(x), v))) > 2:
+            raise ValueError()
+
         return bytes(map(lambda x: int(x, 16), data.lower().split(" ")))
 
     if hint == ParseHint.ByteArray:
@@ -72,7 +76,9 @@ class LengthTypeValue:
             converted_value = str_to_ascii_6bit(self.value)
         elif self.length_type.type == ValueType.LanguageCodeDependent:
             if not isinstance(self.value, str):
-                raise BinaryConversionError("Language Dependent value should be string")
+                raise BinaryConversionError(
+                    f"Language Dependent value should be string, but it's {self.value} ({type(self.value).__name__})"
+                )
 
             if language_code == LanguageCode.English:
                 try:
@@ -119,9 +125,11 @@ class LengthTypeValue:
             length_type=lt,
             value=parse_value(
                 data[yaml_names.LENGTH_TYPE_VALUE_KEY],
-                ParseHint.ByteArray
-                if lt.type == ValueType.BinaryOrUnspecified
-                else None,
+                (
+                    ParseHint.ByteArray
+                    if lt.type == ValueType.BinaryOrUnspecified
+                    else None
+                ),
             ),
         )
 

@@ -131,10 +131,11 @@ class ProductInfoArea:
     def from_binary(data: bytes) -> "ProductInfoArea":
         # Validate version
         pointer = 0
-        if data[pointer] != PRODUCT_INFO_AREA_VERSION:
-            raise FruValidationError(
-                f"Product Info Area version {data[0]} is not {PRODUCT_INFO_AREA_VERSION}"
-            )
+        print("Product data version: ", str(data[pointer]))
+        # if data[pointer] != PRODUCT_INFO_AREA_VERSION:
+        #     raise FruValidationError(
+        #         f"Product Info Area version {data[0]} is not {PRODUCT_INFO_AREA_VERSION}"
+        #     )
         pointer += 1
 
         # We do not use this

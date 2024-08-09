@@ -2,6 +2,7 @@ import ctypes
 import dataclasses
 import typing as tp
 
+from converter.internal.internal_use_area import InternalUseArea
 from converter.internal.chassis_info_area import ChassisInfoArea
 from converter.internal.board_info_area import BoardInfoArea
 from converter.internal.product_info_area import ProductInfoArea
@@ -34,6 +35,7 @@ class CommonHeaderStructure(ctypes.Structure):
 
 @dataclasses.dataclass()
 class FruData:
+    internal_info: tp.Optional[InternalUseArea]
     chassis_info: tp.Optional[ChassisInfoArea]
     board_info: tp.Optional[BoardInfoArea]
     product_info: tp.Optional[ProductInfoArea]
@@ -51,7 +53,7 @@ class FruData:
                     return offset // OFFSET_MUL
             return 0
 
-        # todo: add internal use area serialization
+        internal_use_offset = serialize(result, self.internal_info)
         chassis_info_offset = serialize(result, self.chassis_info)
         board_info_offset = serialize(result, self.board_info)
         product_info_offset = serialize(result, self.product_info)
@@ -59,7 +61,7 @@ class FruData:
 
         common_header = CommonHeaderStructure(
             format_version=FRU_FORMAT_VERSION,
-            internal_use_area_starting_offset=0,
+            internal_use_area_starting_offset=internal_use_offset,
             chassis_info_area_starting_offset=chassis_info_offset,
             board_area_starting_offset=board_info_offset,
             product_info_area_starting_offset=product_info_offset,
@@ -81,6 +83,7 @@ class FruData:
             else:
                 result[name] = None
 
+        parse(self.internal_info, yaml_names.AREA_INTERNAL_USE_KEY)
         parse(self.chassis_info, yaml_names.AREA_CHASSIS_INFO_KEY)
         parse(self.board_info, yaml_names.AREA_BOARD_INFO_KEY)
         parse(self.product_info, yaml_names.AREA_PRODUCT_INFO_KEY)
@@ -95,12 +98,16 @@ class FruData:
         common_header = CommonHeaderStructure.from_buffer_copy(data, 0)
 
         format_version = common_header.format_version & 0b0000_1111
-        if format_version != FRU_FORMAT_VERSION:
-            raise FruValidationError(
-                f"Fru format version '{format_version}' != '{FRU_FORMAT_VERSION}'"
-            )
+        # if format_version != FRU_FORMAT_VERSION:
+        #     raise FruValidationError(
+        #         f"Fru format version '{format_version}' != '{FRU_FORMAT_VERSION}'"
+        #     )
 
-        # todo: add internal use area parsing
+        internal_use_area: tp.Optional[InternalUseArea] = None
+        if common_header.internal_use_area_starting_offset:
+            internal_use_area = InternalUseArea.from_binary(
+                data[common_header.internal_use_area_starting_offset * OFFSET_MUL :]
+            )
 
         # Offsetting to chassis info and parsing it
         chassis_info_area: tp.Optional[ChassisInfoArea] = None
@@ -130,6 +137,7 @@ class FruData:
                 data[common_header.multirecord_area_starting_offset * OFFSET_MUL :]
             )
         return FruData(
+            internal_info=internal_use_area,
             chassis_info=chassis_info_area,
             board_info=board_info_area,
             product_info=product_info_area,
@@ -144,6 +152,7 @@ class FruData:
         data = data[yaml_names.ROOT_AREAS_KEY]
 
         mandatory_fields = [
+            yaml_names.AREA_INTERNAL_USE_KEY,
             yaml_names.AREA_CHASSIS_INFO_KEY,
             yaml_names.AREA_BOARD_INFO_KEY,
             yaml_names.AREA_PRODUCT_INFO_KEY,
@@ -159,6 +168,10 @@ class FruData:
             return cls.from_yaml(data[key])
 
         return FruData(
+            internal_info=parse_with(
+                InternalUseArea,
+                yaml_names.AREA_INTERNAL_USE_KEY,
+            ),
             chassis_info=parse_with(
                 ChassisInfoArea,
                 yaml_names.AREA_CHASSIS_INFO_KEY,

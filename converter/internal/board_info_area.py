@@ -74,12 +74,12 @@ class BoardInfoArea:
         result.append(language_code_to_index(self.language_code))
 
         # 3 bytes manufacturing date/time
-        if self.manufacturing_datetime < MANUFACTURING_START_DATE:
-            raise FruValidationError(
-                f"Date {self.manufacturing_datetime} is less than {MANUFACTURING_START_DATE}"
-            )
-
         if self.manufacturing_datetime is not None:
+            if self.manufacturing_datetime < MANUFACTURING_START_DATE:
+                raise FruValidationError(
+                    f"Date {self.manufacturing_datetime} is less than {MANUFACTURING_START_DATE}"
+                )
+
             minutes = (
                 int(
                     (
@@ -130,9 +130,9 @@ class BoardInfoArea:
         }
 
         if self.manufacturing_datetime is not None:
-            result[
-                yaml_names.BOARD_INFO_MANUFACTURING_DATETIME_KEY
-            ] = self.manufacturing_datetime
+            result[yaml_names.BOARD_INFO_MANUFACTURING_DATETIME_KEY] = (
+                self.manufacturing_datetime
+            )
 
         result.update(
             {
@@ -240,7 +240,7 @@ class BoardInfoArea:
     @staticmethod
     def from_yaml(data: tp.Any) -> "BoardInfoArea":
         mandatory_fields = [
-            yaml_names.BOARD_INFO_MANUFACTURING_DATETIME_KEY,
+            # yaml_names.BOARD_INFO_MANUFACTURING_DATETIME_KEY,
             yaml_names.BOARD_INFO_MANUFACTURER_KEY,
             yaml_names.BOARD_INFO_PRODUCT_NAME_KEY,
             yaml_names.BOARD_INFO_SERIAL_NUMBER_KEY,
@@ -260,9 +260,9 @@ class BoardInfoArea:
             language_code=str_to_language_code(
                 data[yaml_names.BOARD_INFO_LANGUAGE_CODE_KEY]
             ),
-            manufacturing_datetime=data[
+            manufacturing_datetime=data.get(
                 yaml_names.BOARD_INFO_MANUFACTURING_DATETIME_KEY
-            ],
+            ),
             manufacturer=LengthTypeValue.from_yaml(
                 data[yaml_names.BOARD_INFO_MANUFACTURER_KEY]
             ),

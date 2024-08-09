@@ -12,6 +12,7 @@ LENGTH_TYPE_TYPE_KEY = "type"
 LENGTH_TYPE_VALUE_KEY = "value"
 
 # Areas
+AREA_INTERNAL_USE_KEY = "internal_use_area"
 AREA_CHASSIS_INFO_KEY = "chassis_info_area"
 AREA_BOARD_INFO_KEY = "board_info_area"
 AREA_PRODUCT_INFO_KEY = "product_info_area"
