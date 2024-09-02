@@ -1,4 +1,6 @@
 areas:
+  internal_use_area: null
+
   chassis_info_area:
     chassis_type: PizzaBox
     part_number:
@@ -12,12 +14,12 @@ areas:
     custom_info_fields: # May be not present, be empty or null
     - type: binary_or_unspecified
       value: 01 02 03 04 05 06 07 08 09
-          
+
     - type: bcd_plus
       value: 123.324-123 234-123 # `0123456789 -.` only allowed
 
     - type: 6bit_ascii
-      value: HELLO_WORLD 
+      value: HELLO_WORLD
 
     - type: language_dependent
       value: some_english # it's illegal to use here anything, that can't be encoded with latin-1
@@ -28,11 +30,11 @@ areas:
     manufacturer_name:
       type: language_dependent
       value: DeltaComputers
-        
+
     product_name:
       type: language_dependent
       value: SomeCoolBoardProduct
-        
+
     serial_number:
       type: 6bit_ascii
       value: SOME_BOARD_SERIALNUMBER
@@ -44,7 +46,7 @@ areas:
     fru_file_id:
       type: binary_or_unspecified
       value: 0a 0b 0c # Bytearray string. May be `null`.
-    
+
     custom_manufacturing_fields: []
 
   product_info_area:
@@ -52,15 +54,15 @@ areas:
     manufacturer_name:
       type: language_dependent
       value: DeltaComputers
-        
+
     product_name:
       type: language_dependent
       value: SomeCoolProduct
-        
+
     product_version:
       type: language_dependent
       value: CoolVersion
-        
+
     part_number:
       type: 6bit_ascii
       value: SOME_PRODUCT_PARTNUMBER
@@ -72,78 +74,14 @@ areas:
     asset_tag:
       type: language_dependent
       value: SomeAssetTag
-      
+
     fru_file_id:
       type: binary_or_unspecified
       value: 0a 0b 0c # Bytearray string. May be `null`
-    
+
     custom_info_fields: []
 
   multirecord_area:
-    - type: power_supply_information
-      value:
-        overall_capacity_watts: 100
-        peak_va: 2 # [0, 65535]
-        inrush_current: 12 # [0, 255]
-        inrush_interval_in_ms: 5 # [0, 255]
-
-        low_end_input_voltage_range_1: 10 # [0, 65535] (10mV)
-        high_end_input_voltage_range_1: 10 # [0, 65535] (10mV)
-
-        low_end_input_voltage_range_2: 10 # [0, 65535] (10mV) may be not present, `null` or 0 if single range.
-        high_end_input_voltage_range_2: 10 # [0, 65535] (10mV) may be not present,  `null` or 0 if single range.
-
-        low_end_input_frequency_range: 20 # [0, 255] 
-        high_end_input_frequency_range: 20 # [0, 255]
-
-        input_dropout_tolerance_ms: 1 # [0, 255]
-
-        peak_wattage:
-          hold_up_time_sec: 2 # [0, 15]
-          peak_capacity_watts: 100 # [0, 4095] may be not present, `null` or 0 if unspecified.
-
-        combined_wattage:
-          voltage_1: 10 # [0, 4095]
-          voltage_2: 10 # [0, 4095]
-          total_combined_wattage: 200 # [0, 65535]
-
-        predictive_fail_tachimeter_lower_threshold_rps: 100 # [0, 255]
-
-        flags:
-          - predictive_fail_support
-          - power_factor_correction
-          - autoswitch
-          - hot_swap_support
-          - tachometer_pulses_per_rotation_or_predictiv_fail_pin_polarity
-
-    - type: dc_output
-      value:
-        output_information:
-          standby: true
-          output_number: 2 # [0, 15]
-
-        nominal_voltage: 100 # [0, 65535] (10mV)
-        maximum_negative_voltage: 100 # [0, 65535] (10mV)
-        maximum_positive_voltage: 100 # [0, 65535] (10mV)
-        ripple_and_noize_10Hz_to_30MHz: 10 # [0, 65535] (10mV)
-        minimum_current_draw: 100 # [0, 65535] mA
-        maximum_current_draw: 100 # [0, 65535] mA
-
-    - type: dc_load
-      value:
-        voltage_required:
-          output_number: 2 # [0, 15]
-
-        nominal_voltage: 100 # [0, 65535] (10 mV)
-
-        specified_minimum_voltage: 100 # [0, 65535] (10 mV)
-        specified_maximum_voltage: 100 # [0, 65535] (10 mV)
-
-        specified_ripple_and_noize_10Hz_to_30MHz: 10 # [0, 65535] (10mV)
-
-        minimum_current_load: 100 # [0, 65535] mA
-        maximum_current_load: 100 # [0, 65535] mA
-
     - type: management_access
       value:
         sub_record_type: system_management_url
@@ -179,53 +117,118 @@ areas:
         sub_record_type: system_unique_id
         value: 00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f # 16 bytes
 
-    - type: base_compatibility
-      value:
-        manufacturer_id: 01 02 03 # 3 bytes, bytearray string (See IPMI Get Device ID command Manufacturer ID field)
-        entity_id: processor # Entity ID from IPMI Table #43
-        compatibility_base: 0x12 # [0, 255]
-        code_start: 0x0A # [0, 255]
-        code_range_masks: # At least one mask is requred. Each mask is 1 byte long.
-          - 0b00000001
-          - 0b10000000
+    # - type: power_supply_information
+    #   value:
+    #     overall_capacity_watts: 100
+    #     peak_va: 2 # [0, 65535]
+    #     inrush_current: 12 # [0, 255]
+    #     inrush_interval_in_ms: 5 # [0, 255]
 
-    - type: extended_compatibility
-      value:
-        manufacturer_id: 01 02 03 # 3 bytes, bytearray string (See IPMI Get Device ID command Manufacturer ID field)
-        entity_id: processor # Entity ID from IPMI Table #43
-        compatibility_base: 0x12 # [0, 255]
-        code_start: 0x0A # [0, 255]
-        code_range_masks: # At least one mask is requred. Each mask is 1 byte long.
-          - 0b00000001
-          - 0b10000000
+    #     low_end_input_voltage_range_1: 10 # [0, 65535] (10mV)
+    #     high_end_input_voltage_range_1: 10 # [0, 65535] (10mV)
 
-    - type: extended_dc_output # It's identical with basic DCOutput. But this one can choose units (10mV / 100mV)
-      value:
-        output_information:
-          standby: true
-          units: 100 # 100/10 mV (100 mV if not defined)
-          output_number: 2 # [0, 15]
+    #     low_end_input_voltage_range_2: 10 # [0, 65535] (10mV) may be not present, `null` or 0 if single range.
+    #     high_end_input_voltage_range_2: 10 # [0, 65535] (10mV) may be not present,  `null` or 0 if single range.
 
-        nominal_voltage: 100 # [0, 65535] (100mV)
-        maximum_negative_voltage: 100 # [0, 65535] (100mV)
-        maximum_positive_voltage: 100 # [0, 65535] (100mV)
-        ripple_and_noize_10Hz_to_30MHz: 10 # [0, 65535] (100mV)
-        minimum_current_draw_ma: 100 # [0, 65535] mA
-        maximum_current_draw_ma: 100 # [0, 65535] mA
+    #     low_end_input_frequency_range: 20 # [0, 255]
+    #     high_end_input_frequency_range: 20 # [0, 255]
 
-    - type: extended_dc_load
-      value:
-        voltage_required:
-          units: 100 # 100/10 mA (100mA if not defined)
-          output_number: 2 # [0, 15]
+    #     input_dropout_tolerance_ms: 1 # [0, 255]
 
-        nominal_voltage: 100 # [0, 65535] (10 mV)
+    #     peak_wattage:
+    #       hold_up_time_sec: 2 # [0, 15]
+    #       peak_capacity_watts: 100 # [0, 4095] may be not present, `null` or 0 if unspecified.
 
-        specified_minimum_voltage: 100 # [0, 65535] (10 mV)
-        specified_maximum_voltage: 100 # [0, 65535] (10 mV)
+    #     combined_wattage:
+    #       voltage_1: 10 # [0, 4095]
+    #       voltage_2: 10 # [0, 4095]
+    #       total_combined_wattage: 200 # [0, 65535]
 
-        specified_ripple_and_noize_10Hz_to_30MHz: 10 # [0, 65535] (10mV)
+    #     predictive_fail_tachimeter_lower_threshold_rps: 100 # [0, 255]
 
-        minimum_current_load: 100 # [0, 65535] 100 mA
-        maximum_current_load: 100 # [0, 65535] 100 mA  
+    #     flags:
+    #       - predictive_fail_support
+    #       - power_factor_correction
+    #       - autoswitch
+    #       - hot_swap_support
+    #       - tachometer_pulses_per_rotation_or_predictiv_fail_pin_polarity
 
+    # - type: dc_output
+    #   value:
+    #     output_information:
+    #       standby: true
+    #       output_number: 2 # [0, 15]
+
+    #     nominal_voltage: 100 # [0, 65535] (10mV)
+    #     maximum_negative_voltage: 100 # [0, 65535] (10mV)
+    #     maximum_positive_voltage: 100 # [0, 65535] (10mV)
+    #     ripple_and_noize_10Hz_to_30MHz: 10 # [0, 65535] (10mV)
+    #     minimum_current_draw: 100 # [0, 65535] mA
+    #     maximum_current_draw: 100 # [0, 65535] mA
+
+    # - type: dc_load
+    #   value:
+    #     voltage_required:
+    #       output_number: 2 # [0, 15]
+
+    #     nominal_voltage: 100 # [0, 65535] (10 mV)
+
+    #     specified_minimum_voltage: 100 # [0, 65535] (10 mV)
+    #     specified_maximum_voltage: 100 # [0, 65535] (10 mV)
+
+    #     specified_ripple_and_noize_10Hz_to_30MHz: 10 # [0, 65535] (10mV)
+
+    #     minimum_current_load: 100 # [0, 65535] mA
+    #     maximum_current_load: 100 # [0, 65535] mA
+
+
+
+    # - type: base_compatibility
+    #   value:
+    #     manufacturer_id: 01 02 03 # 3 bytes, bytearray string (See IPMI Get Device ID command Manufacturer ID field)
+    #     entity_id: processor # Entity ID from IPMI Table #43
+    #     compatibility_base: 0x12 # [0, 255]
+    #     code_start: 0x0A # [0, 255]
+    #     code_range_masks: # At least one mask is requred. Each mask is 1 byte long.
+    #       - 0b00000001
+    #       - 0b10000000
+
+    # - type: extended_compatibility
+    #   value:
+    #     manufacturer_id: 01 02 03 # 3 bytes, bytearray string (See IPMI Get Device ID command Manufacturer ID field)
+    #     entity_id: processor # Entity ID from IPMI Table #43
+    #     compatibility_base: 0x12 # [0, 255]
+    #     code_start: 0x0A # [0, 255]
+    #     code_range_masks: # At least one mask is requred. Each mask is 1 byte long.
+    #       - 0b00000001
+    #       - 0b10000000
+
+    # - type: extended_dc_output # It's identical with basic DCOutput. But this one can choose units (10mV / 100mV)
+    #   value:
+    #     output_information:
+    #       standby: true
+    #       units: 100 # 100/10 mV (100 mV if not defined)
+    #       output_number: 2 # [0, 15]
+
+    #     nominal_voltage: 100 # [0, 65535] (100mV)
+    #     maximum_negative_voltage: 100 # [0, 65535] (100mV)
+    #     maximum_positive_voltage: 100 # [0, 65535] (100mV)
+    #     ripple_and_noize_10Hz_to_30MHz: 10 # [0, 65535] (100mV)
+    #     minimum_current_draw_ma: 100 # [0, 65535] mA
+    #     maximum_current_draw_ma: 100 # [0, 65535] mA
+
+    # - type: extended_dc_load
+    #   value:
+    #     voltage_required:
+    #       units: 100 # 100/10 mA (100mA if not defined)
+    #       output_number: 2 # [0, 15]
+
+    #     nominal_voltage: 100 # [0, 65535] (10 mV)
+
+    #     specified_minimum_voltage: 100 # [0, 65535] (10 mV)
+    #     specified_maximum_voltage: 100 # [0, 65535] (10 mV)
+
+    #     specified_ripple_and_noize_10Hz_to_30MHz: 10 # [0, 65535] (10mV)
+
+    #     minimum_current_load: 100 # [0, 65535] 100 mA
+    #     maximum_current_load: 100 # [0, 65535] 100 mA
