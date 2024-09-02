@@ -33,6 +33,34 @@ class CommonHeaderStructure(ctypes.Structure):
     ]
 
 
+def get_bounded(
+    data: bytearray, common_header: CommonHeaderStructure, starting_offset: int
+):
+    end_offset = len(data)
+
+    if starting_offset < common_header.internal_use_area_starting_offset:
+        end_offset = min(
+            end_offset, common_header.internal_use_area_starting_offset * OFFSET_MUL
+        )
+
+    if starting_offset < common_header.chassis_info_area_starting_offset:
+        end_offset = min(
+            end_offset, common_header.chassis_info_area_starting_offset * OFFSET_MUL
+        )
+
+    if starting_offset < common_header.board_area_starting_offset:
+        end_offset = min(
+            end_offset, common_header.board_area_starting_offset * OFFSET_MUL
+        )
+
+    if starting_offset < common_header.product_info_area_starting_offset:
+        end_offset = min(
+            end_offset, common_header.product_info_area_starting_offset * OFFSET_MUL
+        )
+
+    return data[starting_offset * OFFSET_MUL : end_offset]
+
+
 @dataclasses.dataclass()
 class FruData:
     internal_info: tp.Optional[InternalUseArea]
@@ -98,36 +126,52 @@ class FruData:
         common_header = CommonHeaderStructure.from_buffer_copy(data, 0)
 
         format_version = common_header.format_version & 0b0000_1111
-        # if format_version != FRU_FORMAT_VERSION:
-        #     raise FruValidationError(
-        #         f"Fru format version '{format_version}' != '{FRU_FORMAT_VERSION}'"
-        #     )
+        if format_version != FRU_FORMAT_VERSION:
+            raise FruValidationError(
+                f"Fru format version '{format_version}' != '{FRU_FORMAT_VERSION}'"
+            )
 
         internal_use_area: tp.Optional[InternalUseArea] = None
         if common_header.internal_use_area_starting_offset:
             internal_use_area = InternalUseArea.from_binary(
-                data[common_header.internal_use_area_starting_offset * OFFSET_MUL :]
+                get_bounded(
+                    data,
+                    common_header,
+                    common_header.internal_use_area_starting_offset,
+                )
             )
 
         # Offsetting to chassis info and parsing it
         chassis_info_area: tp.Optional[ChassisInfoArea] = None
         if common_header.chassis_info_area_starting_offset:
             chassis_info_area = ChassisInfoArea.from_binary(
-                data[common_header.chassis_info_area_starting_offset * OFFSET_MUL :]
+                get_bounded(
+                    data,
+                    common_header,
+                    common_header.chassis_info_area_starting_offset,
+                )
             )
 
         # Offsetting to board info and parsing it
         board_info_area: tp.Optional[BoardInfoArea] = None
         if common_header.board_area_starting_offset:
             board_info_area = BoardInfoArea.from_binary(
-                data[common_header.board_area_starting_offset * OFFSET_MUL :]
+                get_bounded(
+                    data,
+                    common_header,
+                    common_header.board_area_starting_offset,
+                )
             )
 
         # Offsetting to product info area and parsing it
         product_info_area: tp.Optional[ProductInfoArea] = None
         if common_header.product_info_area_starting_offset:
             product_info_area = ProductInfoArea.from_binary(
-                data[common_header.product_info_area_starting_offset * OFFSET_MUL :]
+                get_bounded(
+                    data,
+                    common_header,
+                    common_header.product_info_area_starting_offset,
+                )
             )
 
         # Offsetting to multirecord area and parsing it
@@ -146,7 +190,7 @@ class FruData:
 
     @staticmethod
     def from_yaml(data: tp.Any) -> "FruData":
-        # todo: Probably mode this section to converter
+        # todo: Probably move this section to converter
         if yaml_names.ROOT_AREAS_KEY not in data:
             raise YamlFormatError(f"No root key '{yaml_names.ROOT_AREAS_KEY}'")
         data = data[yaml_names.ROOT_AREAS_KEY]

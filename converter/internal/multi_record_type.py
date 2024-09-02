@@ -1,8 +1,13 @@
-import enum
+import aenum
 import typing as tp
 
 
-class MultiRecordType(enum.Enum):
+def make_multirecord_type_id(manufacturer_id, type_id):
+    return type_id | (manufacturer_id << 8)
+
+
+class MultiRecordType(aenum.Enum):
+    # Default Values from specification
     PowerSupplyInformation = 0x00
     DCOutput = 0x01
     DCLoad = 0x02
@@ -14,6 +19,7 @@ class MultiRecordType(enum.Enum):
 
 
 MULTI_RECORD_TYPE_TO_NAME_MAP = {
+    # Default Values from specification
     MultiRecordType.PowerSupplyInformation: "power_supply_information",
     MultiRecordType.DCOutput: "dc_output",
     MultiRecordType.DCLoad: "dc_load",
@@ -25,25 +31,29 @@ MULTI_RECORD_TYPE_TO_NAME_MAP = {
 }
 
 NAME_TO_MULTI_RECORD_TYPE_MAP = {
-    MULTI_RECORD_TYPE_TO_NAME_MAP[
-        MultiRecordType.PowerSupplyInformation
+    MULTI_RECORD_TYPE_TO_NAME_MAP[  #
+        MultiRecordType.PowerSupplyInformation  #
     ]: MultiRecordType.PowerSupplyInformation,
-    MULTI_RECORD_TYPE_TO_NAME_MAP[MultiRecordType.DCOutput]: MultiRecordType.DCOutput,
-    MULTI_RECORD_TYPE_TO_NAME_MAP[MultiRecordType.DCLoad]: MultiRecordType.DCLoad,
-    MULTI_RECORD_TYPE_TO_NAME_MAP[
-        MultiRecordType.ManagementAccessRecord
+    MULTI_RECORD_TYPE_TO_NAME_MAP[  #
+        MultiRecordType.DCOutput  #
+    ]: MultiRecordType.DCOutput,
+    MULTI_RECORD_TYPE_TO_NAME_MAP[  #
+        MultiRecordType.DCLoad  #
+    ]: MultiRecordType.DCLoad,  #
+    MULTI_RECORD_TYPE_TO_NAME_MAP[  #
+        MultiRecordType.ManagementAccessRecord  #
     ]: MultiRecordType.ManagementAccessRecord,
-    MULTI_RECORD_TYPE_TO_NAME_MAP[
-        MultiRecordType.BaseCompatibilityRecord
+    MULTI_RECORD_TYPE_TO_NAME_MAP[  #
+        MultiRecordType.BaseCompatibilityRecord  #
     ]: MultiRecordType.BaseCompatibilityRecord,
-    MULTI_RECORD_TYPE_TO_NAME_MAP[
+    MULTI_RECORD_TYPE_TO_NAME_MAP[  #
         MultiRecordType.ExtendedCompatibilityRecord
     ]: MultiRecordType.ExtendedCompatibilityRecord,
-    MULTI_RECORD_TYPE_TO_NAME_MAP[
-        MultiRecordType.ExtendedDCOutput
+    MULTI_RECORD_TYPE_TO_NAME_MAP[  #
+        MultiRecordType.ExtendedDCOutput  #
     ]: MultiRecordType.ExtendedDCOutput,
-    MULTI_RECORD_TYPE_TO_NAME_MAP[
-        MultiRecordType.ExtendedDCLoad
+    MULTI_RECORD_TYPE_TO_NAME_MAP[  #
+        MultiRecordType.ExtendedDCLoad  #
     ]: MultiRecordType.ExtendedDCLoad,
 }
 
@@ -63,11 +73,11 @@ def multi_record_type_to_str(t: MultiRecordType) -> str:
 
 
 def multi_record_type_to_index(t: MultiRecordType) -> int:
-    return t.value
+    return t.value & 0xFF
 
 
-def index_to_multi_record_type(index: int) -> tp.Optional[MultiRecordType]:
-    try:
-        return MultiRecordType(index)
-    except ValueError:
-        return None
+def index_to_multi_record_type(
+    index: int,
+    manufacturer_id: int = 0,
+) -> tp.Optional[MultiRecordType]:
+    return MultiRecordType(make_multirecord_type_id(manufacturer_id, index))

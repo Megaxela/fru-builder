@@ -3,6 +3,10 @@ import argparse
 import sys
 import os
 
+from converter.internal.records.generic_record import (
+    register_generic_multirecord_processors,
+)
+import converter.plugins
 import converter.binary_converter
 import converter.yaml_converter
 
@@ -28,6 +32,9 @@ def parse_args(placeholder: tp.Optional[tp.Any] = None):
 
 
 def main(args):
+    register_generic_multirecord_processors()
+    converter.plugins.load_plugins()
+
     binary_converter = converter.binary_converter.BinaryConverter()
     yaml_converter = converter.yaml_converter.YamlConverter()
 

@@ -166,6 +166,7 @@ class LengthTypeValue:
             else:
                 # Specification declares this values as 2 byte unicode,
                 # but it's essentially utf-16 BE. Using it for native conversion.
+                print(language_code, lt, values_raw)
                 return LengthTypeValue(
                     length_type=lt,
                     value=values_raw.decode("utf-16be"),

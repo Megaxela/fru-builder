@@ -28,16 +28,12 @@ class InternalUseArea:
         return bytes(self.body)
 
     def to_yaml(self) -> tp.Any:
-        result = self.body.hex()
+        return self.body.hex()
 
     @staticmethod
     def from_binary(data: bytes) -> "InternalUseArea":
-        return InternalUseArea(
-            body=bytearray(data)
-        )
+        return InternalUseArea(body=bytearray(data))
 
     @staticmethod
     def from_yaml(data: tp.Any) -> "InternalUseArea":
-        return InternalUseArea(
-            body=bytearray.fromhex(data)
-        )
+        return InternalUseArea(body=bytearray.fromhex(data))

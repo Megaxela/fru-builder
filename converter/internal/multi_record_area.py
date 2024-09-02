@@ -12,6 +12,7 @@ from converter.internal.multi_record_type import (
 from converter.internal.errors import (
     FruValidationError,
     YamlFormatError,
+    BinaryConversionError,
 )
 from converter.internal.records.basic_record import BasicRecord
 from converter.internal.records.management_access_record import ManagementAccessRecord
@@ -69,8 +70,20 @@ class MultiRecordAreaRecordHeader:
                 f"Multirecord version {version} is not {MULTIRECORD_RECORD_VERSION}"
             )
 
+        # Special parsing for OEM multirecord records
+        manufacturer_id = 0x000000
+        if data[0] >= 0xC0 and data[0] <= 0xFF:
+            manufacturer_id = data[5] | (data[6] << 8) | (data[7] << 16)
+
+        try:
+            record_type_id = index_to_multi_record_type(data[0], manufacturer_id)
+        except ValueError:
+            # We can't parse this one. Removing manufacture id from equasion
+            # And pretending, that it's just simple generic multirecord
+            record_type_id = index_to_multi_record_type(data[0])
+
         return MultiRecordAreaRecordHeader(
-            record_type_id=index_to_multi_record_type(data[0]),
+            record_type_id=record_type_id,
             end_of_list=(data[1] & 0b1000_0000) != 0,
             record_length=data[2],
             record_checksum=data[3],
@@ -128,17 +141,21 @@ class MultiRecordArea:
 
             # todo: throw if unknown type instead of ignoring
             cls = MULTIRECORD_TYPE_TO_RECORD.get(header.record_type_id)
-            if cls is not None:
-                result.append(
-                    cls.from_binary(
-                        data[
-                            pointer
-                            + MULTIRECORD_HEADER_SIZE : pointer
-                            + MULTIRECORD_HEADER_SIZE
-                            + header.record_length
-                        ]
-                    )
+            if cls is None:
+                raise BinaryConversionError(
+                    f"Unknown multirecord type 0x{header.record_type_id.value:02X} ({header.record_type_id})"
                 )
+
+            result.append(
+                cls.from_binary(
+                    data[
+                        pointer
+                        + MULTIRECORD_HEADER_SIZE : pointer
+                        + MULTIRECORD_HEADER_SIZE
+                        + header.record_length
+                    ]
+                )
+            )
             pointer += MULTIRECORD_HEADER_SIZE + header.record_length
 
             if header.end_of_list:
