@@ -3,6 +3,8 @@ import argparse
 import sys
 import os
 
+sys.path.append(os.path.split(__file__)[0])
+
 from converter.internal.records.generic_record import (
     register_generic_multirecord_processors,
 )
@@ -31,7 +33,8 @@ def parse_args(placeholder: tp.Optional[tp.Any] = None):
     return args.parse_args(placeholder)
 
 
-def main(args):
+def main():
+    args = parse_args()
     register_generic_multirecord_processors()
     converter.plugins.load_plugins()
 
@@ -53,4 +56,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    main(parse_args())
+    main()
