@@ -15,16 +15,13 @@ class ParseHint(enum.Enum):
     ByteArray = enum.auto()
 
 
-def parse_value(data: str, hint: ParseHint = None):
+def parse_value(data: str):
     def parse_as_bytearray():
         v = data.lower().split(" ")
         if len(v) == 0 or max(*list(map(lambda x: len(x), v))) > 2:
             raise ValueError()
 
         return bytes(map(lambda x: int(x, 16), data.lower().split(" ")))
-
-    if hint == ParseHint.ByteArray:
-        return parse_as_bytearray()
 
     try:
         return parse_as_bytearray()
@@ -123,14 +120,7 @@ class LengthTypeValue:
         lt = LengthType.from_yaml(type_str)
         return LengthTypeValue(
             length_type=lt,
-            value=parse_value(
-                data[yaml_names.LENGTH_TYPE_VALUE_KEY],
-                (
-                    ParseHint.ByteArray
-                    if lt.type == ValueType.BinaryOrUnspecified
-                    else None
-                ),
-            ),
+            value=parse_value(data[yaml_names.LENGTH_TYPE_VALUE_KEY]),
         )
 
     @staticmethod
