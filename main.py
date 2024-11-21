@@ -21,7 +21,20 @@ def existing_path(path: str):
 
 
 def parse_args(placeholder: tp.Optional[tp.Any] = None):
-    args = argparse.ArgumentParser()
+    epilog = "Enabled plugins:"
+
+    plugins = converter.plugins.list_plugins()
+    if plugins:
+        epilog += "\n"
+        for plugin in plugins:
+            epilog += f"  {plugin.__name__}\n"
+    else:
+        epilog += " none"
+
+    args = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=epilog,
+    )
 
     args.add_argument(
         "--convert",
