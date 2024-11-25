@@ -62,8 +62,14 @@ def str_to_multi_record_type(name: str) -> tp.Optional[MultiRecordType]:
     lc_name = name.lower()
     val = NAME_TO_MULTI_RECORD_TYPE_MAP.get(lc_name)
     if val is None:
+        # Filter `generic_XX` fields from help message
+        allowed_values = filter(
+            lambda x: not x.startswith("generic_"),
+            NAME_TO_MULTI_RECORD_TYPE_MAP.keys(),
+        )
+
         raise ValueError(
-            f"Unknown multirecord type '{lc_name}'. Available values: [{', '.join(NAME_TO_MULTI_RECORD_TYPE_MAP.keys())}]"
+            f"Unknown multirecord type '{lc_name}'. Available values: [\n{',\n'.join(f'    {i}' for i in allowed_values)}\n]"
         )
     return val
 

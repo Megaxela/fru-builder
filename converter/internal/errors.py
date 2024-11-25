@@ -1,4 +1,8 @@
-class YamlFormatError(Exception):
+class FormatError(Exception):
+    pass
+
+
+class YamlFormatError(FormatError):
     def __init__(self, message):
         self._message = message
 
@@ -20,7 +24,7 @@ class FruValidationError(Exception):
         return self._message
 
 
-class BinaryConversionError(Exception):
+class BinaryConversionError(FormatError):
     def __init__(self, message):
         self._message = message
 

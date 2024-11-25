@@ -1,2 +1,4 @@
 aenum
 PyYaml
+textual
+textual-fspicker

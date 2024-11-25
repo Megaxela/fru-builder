@@ -180,9 +180,12 @@ class MultiRecordArea:
                         f"Multirecord area has no mandatory field '{field}'"
                     )
 
-            record_type = str_to_multi_record_type(
-                record[yaml_names.MULTIRECORD_TYPE_KEY]
-            )
+            try:
+                record_type = str_to_multi_record_type(
+                    record[yaml_names.MULTIRECORD_TYPE_KEY]
+                )
+            except ValueError as e:
+                raise YamlFormatError(str(e))
 
             # todo: throw if unknown type instead of ignoring
             cls = MULTIRECORD_TYPE_TO_RECORD.get(record_type)

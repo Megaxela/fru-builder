@@ -9,6 +9,7 @@ from converter.internal.records.generic_record import (
 import converter.plugins
 import converter.binary_converter
 import converter.yaml_converter
+import tui.application
 
 
 def existing_path(path: str):
@@ -24,7 +25,6 @@ def parse_args(placeholder: tp.Optional[tp.Any] = None):
     args.add_argument(
         "--convert",
         type=existing_path,
-        required=True,
     )
     args.add_argument("--to", type=str)
 
@@ -37,6 +37,12 @@ def main(args):
 
     binary_converter = converter.binary_converter.BinaryConverter()
     yaml_converter = converter.yaml_converter.YamlConverter()
+
+    # If no file for conversion has been provided -
+    # run GUI utility.
+    if args.convert is None:
+        tui.application.Application().run()
+        return
 
     if args.convert.endswith(".yml") or args.convert.endswith(".yaml"):
         if args.to:
