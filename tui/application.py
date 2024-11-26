@@ -105,12 +105,17 @@ class Application(App):
 
     @on(BasicSection.Pressed)
     def on_section_selected(self, message: BasicSection.Pressed):
+        self.query_one(UiEditor).section_id = message.section.section_id
         pass
 
     def on_mount(self) -> None:
         self.title = "FRU Builder"
 
-        # self.__load_file(Path("PATH_TO_EEPROM"))
+        self.__load_file(
+            Path(
+                "/home/megaxela/Development/Projects/Python/delta-fru-builder/examples/eeprom_simple.yaml"
+            )
+        )
 
     def action_open(self) -> None:
         self.push_screen(
@@ -153,3 +158,4 @@ class Application(App):
             self.__current_fru_data = parse_result
 
         self.query_one(SectionsList).set_fru_data(self.__current_fru_data)
+        self.query_one(UiEditor).set_fru_data(self.__current_fru_data)

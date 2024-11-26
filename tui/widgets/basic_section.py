@@ -66,6 +66,10 @@ class BasicSection(Widget):
         self.data = data
         self.section_name = "Basic Section"
 
+    @property
+    def section_id(self):
+        return self.SECTION_ID
+
     def set_selected(self, value: bool):
         if value:
             self.add_class("-toggled")

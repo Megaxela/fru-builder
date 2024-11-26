@@ -1,9 +1,12 @@
 from tui.widgets.basic_section import BasicSection
 from converter.internal.product_info_area import ProductInfoArea
 from tui.language_code import language_code_to_text
+from tui.widgets.section_ids import PRODUCT_INFO_ID
 
 
 class ProductInfoSection(BasicSection):
+    SECTION_ID = PRODUCT_INFO_ID
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

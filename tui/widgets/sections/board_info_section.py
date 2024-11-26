@@ -2,8 +2,12 @@ from tui.widgets.basic_section import BasicSection
 from converter.internal.board_info_area import BoardInfoArea
 from tui.language_code import language_code_to_text
 
+from tui.widgets.section_ids import BOARD_INFO_ID
+
 
 class BoardInfoSection(BasicSection):
+    SECTION_ID = BOARD_INFO_ID
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

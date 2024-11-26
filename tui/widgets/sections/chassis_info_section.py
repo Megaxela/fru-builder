@@ -4,8 +4,12 @@ from converter.internal.chassis_type import (
     CHASSIS_TYPE_TO_NAME_MAP,
 )  # todo: replace it with human readable types
 
+from tui.widgets.section_ids import CHASSIS_INFO_ID
+
 
 class ChassisInfoSection(BasicSection):
+    SECTION_ID = CHASSIS_INFO_ID
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

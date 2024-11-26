@@ -13,10 +13,10 @@ from tui.widgets.sections.board_info_section import BoardInfoSection
 
 
 FIELD_TO_SECTION = {
-    "internal_info": InternalInfoSection,
-    "chassis_info": ChassisInfoSection,
-    "board_info": BoardInfoSection,
-    "product_info": ProductInfoSection,
+    InternalInfoSection.SECTION_ID: InternalInfoSection,
+    ChassisInfoSection.SECTION_ID: ChassisInfoSection,
+    BoardInfoSection.SECTION_ID: BoardInfoSection,
+    ProductInfoSection.SECTION_ID: ProductInfoSection,
     "multirecord_area": BasicSection,
 }
 
