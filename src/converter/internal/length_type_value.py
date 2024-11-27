@@ -83,7 +83,7 @@ class LengthTypeValue:
                     f"Language Dependent value should be string, but it's {self.value} ({type(self.value).__name__})"
                 )
 
-            if language_code == LanguageCode.English:
+            if language_code in {LanguageCode.English, LanguageCode.EnglishLegacy}:
                 try:
                     converted_value = self.value.encode("latin-1")
                 except UnicodeEncodeError as e:
@@ -161,7 +161,7 @@ class LengthTypeValue:
         elif lt.type == ValueType.ASCII6bit:
             return LengthTypeValue(length_type=lt, value=ascii_6bit_to_str(values_raw))
         elif lt.type == ValueType.LanguageCodeDependent:
-            if language_code == LanguageCode.English:
+            if language_code in {LanguageCode.English, LanguageCode.EnglishLegacy}:
                 return LengthTypeValue(
                     length_type=lt,
                     value=values_raw.decode("latin-1"),

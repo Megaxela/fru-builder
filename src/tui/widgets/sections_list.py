@@ -24,9 +24,7 @@ FIELD_TO_SECTION = {
 class SectionsList(VerticalScroll):
     DEFAULT_CSS = """
     SectionsList {
-        height: 100%;
-        dock: left;
-        width: 30%;
+        width: 100%;
     }
     """
 

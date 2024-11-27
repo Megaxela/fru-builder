@@ -6,6 +6,7 @@ from tui.widgets.basic_section_editor import BasicSectionEditor
 from tui.widgets.section_ids import BOARD_INFO_ID
 from tui.language_code import LANGUAGE_CODE_TEXT_TO_VALUE_MAP
 from tui.widgets.value_type_editor import ValueTypeEditor
+from tui.widgets.datetime_editor import DateTimeEditor
 
 
 class BoardInfoSectionEditor(BasicSectionEditor):
@@ -25,14 +26,7 @@ class BoardInfoSectionEditor(BasicSectionEditor):
 
         with VerticalGroup():
             yield Label("Manufacturing Datetime")
-            yield MaskedInput(
-                "99-99-9999 99:99:99",
-                value=(
-                    self.section.manufacturing_datetime.strftime("%d-%m-%Y %H:%M:%S")
-                    if self.section.manufacturing_datetime is not None
-                    else None
-                ),
-            )
+            yield DateTimeEditor(self.section.manufacturing_datetime)
 
         with VerticalGroup():
             yield Label("Manufacturer")

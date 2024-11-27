@@ -9,8 +9,9 @@ from textual.widgets import (
     ListView,
     TabbedContent,
     TabPane,
+    Button,
 )
-from textual.containers import Container
+from textual.containers import Container, VerticalGroup
 from textual.binding import Binding
 from textual_fspicker import FileOpen, FileSave, Filters
 
@@ -23,6 +24,7 @@ from tui.widgets.sections_list import SectionsList
 from tui.widgets.basic_section import BasicSection
 from tui.widgets.ui_editor import UiEditor
 from tui.widgets.yaml_editor import YamlEditor
+from tui.widgets.sections_editor import SectionsEditor
 
 from converter.internal.fru_data import FruData
 from converter.binary_converter import BinaryConverter
@@ -34,6 +36,10 @@ class Application(App):
     CSS = """
     Screen {
         layers: below above;
+    }
+
+    #sections_group {
+        height: auto;
     }
     """
 
@@ -69,7 +75,7 @@ class Application(App):
         with TabbedContent(initial="ui_editor_tab"):
             with TabPane("UI Editor", id="ui_editor_tab"):
                 with Container():
-                    yield SectionsList(id="sections")
+                    yield SectionsEditor(id="sections")
                     yield UiEditor(id="editor")
             with TabPane("YAML Editor", id="yaml_editor_tab"):
                 with Container():
@@ -106,7 +112,6 @@ class Application(App):
     @on(BasicSection.Pressed)
     def on_section_selected(self, message: BasicSection.Pressed):
         self.query_one(UiEditor).section_id = message.section.section_id
-        pass
 
     def on_mount(self) -> None:
         self.title = "FRU Builder"

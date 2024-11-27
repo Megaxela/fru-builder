@@ -1,6 +1,7 @@
 from converter.internal.language_codes import LanguageCode
 
 LANGUAGE_CODE_TO_TEXT_MAP = {
+    LanguageCode.EnglishLegacy: "English (Legacy)",
     LanguageCode.English: "English",
     LanguageCode.Afar: "Afar",
     LanguageCode.Abkhazian: "Abkhazian",
@@ -140,7 +141,7 @@ LANGUAGE_CODE_TO_TEXT_MAP = {
 }
 
 LANGUAGE_CODE_TEXT_TO_VALUE_MAP = {
-    "English": LanguageCode.English,
+    "English (Legacy)": LanguageCode.EnglishLegacy,
     "Afar": LanguageCode.Afar,
     "Abkhazian": LanguageCode.Abkhazian,
     "Afrikaans": LanguageCode.Afrikaans,
@@ -164,6 +165,7 @@ LANGUAGE_CODE_TEXT_TO_VALUE_MAP = {
     "Danish": LanguageCode.Danish,
     "German": LanguageCode.German,
     "Bhutani": LanguageCode.Bhutani,
+    "English": LanguageCode.English,
     "Greek": LanguageCode.Greek,
     "Esperanto": LanguageCode.Esperanto,
     "Spanish": LanguageCode.Spanish,
