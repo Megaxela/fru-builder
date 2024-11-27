@@ -1,0 +1,39 @@
+areas:
+  internal_use_area: null
+  chassis_info_area: null
+  board_info_area: null
+
+  product_info_area:
+    language_code: russian # or ru
+    manufacturer_name:
+      type: language_dependent
+      value: SOME_PRODUCT_MANUFACTURER
+
+    product_name:
+      type: language_dependent
+      value: SOME_PRODUCT_NAME
+
+    product_version:
+      type: language_dependent
+      value: SOME_PRODUCT_VERSION
+
+    part_number:
+      type: 6bit_ascii
+      value: SOME_PRODUCT_PARTNUMBER
+
+    serial_number:
+      type: 6bit_ascii
+      value: SOME_PRODUCT_SERIALNUMBER
+
+    asset_tag:
+      type: language_dependent
+      value: SomeAssetTag
+
+    fru_file_id:
+      type: binary_or_unspecified
+      value: 0a 0b 0c # Bytearray string. May be `null`
+
+    custom_info_fields: []
+
+  # note: this field should be null instead of [], to support reproducibility
+  multirecord_area: null

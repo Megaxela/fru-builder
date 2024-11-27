@@ -1,0 +1,124 @@
+areas:
+  internal_use_area: null
+
+  chassis_info_area:
+    # note: reproducibility of human readable formats supports only lowercase chassis types
+    chassis_type: pizzabox
+    part_number:
+      type: 6bit_ascii
+      value: SOME_CHASSIS_PARTNUMBER
+
+    serial_number:
+      type: 6bit_ascii
+      value: SOME_CHASSIS_SERIALNUMBER
+
+    custom_info_fields: # May be not present, be empty or null
+    - type: binary_or_unspecified
+      value: 01 02 03 04 05 06 07 08 09
+
+    - type: bcd_plus
+      value: 123.324-123 234-123 # `0123456789 -.` only allowed
+
+    - type: 6bit_ascii
+      value: HELLO_WORLD
+
+    - type: language_dependent
+      value: some_english # it's illegal to use here anything, that can't be encoded with latin-1
+
+  board_info_area:
+    # or pl (note: reproducibility of human readable formats supports only lowercase full size language codes)
+    language_code: polish
+
+    # note - seconds are not supported, for reproducibility it should be 00
+    manufacturing_datetime: 2022-04-25 18:34:00 # ISO Format
+
+    manufacturer_name:
+      type: language_dependent
+      value: SOME_BOARD_MANUFACTURER
+
+    product_name:
+      type: language_dependent
+      value: SOME_BOARD_PRODUCT_NAME
+
+    serial_number:
+      type: 6bit_ascii
+      value: SOME_BOARD_SERIALNUMBER
+
+    part_number:
+      type: 6bit_ascii
+      value: SOME_BOARD_PARTNUMBER
+
+    fru_file_id:
+      type: binary_or_unspecified
+      value: 0a 0b 0c # Bytearray string. May be `null`.
+
+    custom_manufacturing_fields: []
+
+  product_info_area:
+    # or ru (note: reproducibility of human readable formats supports only lowercase full size language codes)
+    language_code: russian
+    manufacturer_name:
+      type: language_dependent
+      value: SOME_PRODUCT_MANUFACTURER
+
+    product_name:
+      type: language_dependent
+      value: SOME_PRODUCT_NAME
+
+    product_version:
+      type: language_dependent
+      value: SOME_PRODUCT_VERSION
+
+    part_number:
+      type: 6bit_ascii
+      value: SOME_PRODUCT_PARTNUMBER
+
+    serial_number:
+      type: 6bit_ascii
+      value: SOME_PRODUCT_SERIALNUMBER
+
+    asset_tag:
+      type: language_dependent
+      value: SomeAssetTag
+
+    fru_file_id:
+      type: binary_or_unspecified
+      value: 0a 0b 0c # Bytearray string. May be `null`
+
+    custom_info_fields: []
+
+  multirecord_area:
+    - type: management_access
+      value:
+        sub_record_type: system_management_url
+        value: http://finance.sc.hp.com:280 # 16 - 256 symbols
+
+    - type: management_access
+      value:
+        sub_record_type: system_name
+        value: Some Cool Name # 8 - 64 symbols
+
+    - type: management_access
+      value:
+        sub_record_type: system_ping_address
+        value: 127.0.0.1 # 8 - 64 symbols
+
+    - type: management_access
+      value:
+        sub_record_type: component_management_url
+        value: http://finance.sc.hp.com:280 # 16 - 256 symbols
+
+    - type: management_access
+      value:
+        sub_record_type: component_name
+        value: Some Cool Component Name # 8 - 256 symbols
+
+    - type: management_access
+      value:
+        sub_record_type: component_ping_address
+        value: 127.0.0.2 # 8 - 64 symbols
+
+    - type: management_access
+      value:
+        sub_record_type: system_unique_id
+        value: 00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f # 16 bytes

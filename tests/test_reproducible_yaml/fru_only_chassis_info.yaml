@@ -1,0 +1,32 @@
+areas:
+  internal_use_area: null
+
+  chassis_info_area:
+    chassis_type: pizzabox # names should be lowercase for reproducible results
+
+    part_number:
+      type: 6bit_ascii
+      value: SOME_CHASSIS_PARTNUMBER
+
+    serial_number:
+      type: 6bit_ascii
+      value: SOME_CHASSIS_SERIALNUMBER
+
+    custom_info_fields: # May be not present, be empty or null
+    - type: binary_or_unspecified
+      value: 01 02 03 04 05 06 07 08 09
+
+    - type: bcd_plus
+      value: 123.324-123 234-123 # `0123456789 -.` only allowed
+
+    - type: 6bit_ascii
+      value: HELLO_WORLD
+
+    - type: language_dependent
+      value: some_english # it's illegal to use here anything, that can't be encoded with latin-1
+
+  board_info_area: null
+  product_info_area: null
+
+  # note: this field should be null instead of [], to support reproducibility
+  multirecord_area: null

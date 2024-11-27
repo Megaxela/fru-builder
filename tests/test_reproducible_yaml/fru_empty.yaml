@@ -1,0 +1,8 @@
+areas:
+  internal_use_area: null
+  chassis_info_area: null
+  board_info_area: null
+  product_info_area: null
+
+  # note: this field should be null instead of [], to support reproducibility
+  multirecord_area: null
