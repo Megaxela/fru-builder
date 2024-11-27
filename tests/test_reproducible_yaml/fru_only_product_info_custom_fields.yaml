@@ -1,0 +1,50 @@
+areas:
+  internal_use_area: null
+  chassis_info_area: null
+  board_info_area: null
+
+  product_info_area:
+    language_code: english
+    manufacturer_name:
+      type: language_dependent
+      value: null
+
+    product_name:
+      type: language_dependent
+      value: null
+
+    product_version:
+      type: language_dependent
+      value: null
+
+    part_number:
+      type: 6bit_ascii
+      value: null
+
+    serial_number:
+      type: 6bit_ascii
+      value: null
+
+    asset_tag:
+      type: language_dependent
+      value: null
+
+    fru_file_id:
+      type: binary_or_unspecified
+      value: null
+
+    custom_info_fields:
+    - type: binary_or_unspecified
+      value: 01 02 03 04 05 06 07 08 09
+
+    - type: bcd_plus
+      value: 123.324-123 234-123 # `0123456789 -.` only allowed
+
+    - type: 6bit_ascii
+      value: HELLO_WORLD
+
+    - type: language_dependent
+      value: some_english # it's illegal to use here anything, that can't be encoded with latin-1
+
+  # note: this field should be null instead of [], to support reproducibility
+  multirecord_area: null

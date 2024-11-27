@@ -1,0 +1,42 @@
+areas:
+  internal_use_area: null
+  chassis_info_area: null
+  board_info_area:
+    language_code: polish # note: only full language codes supports reproducibility of human readable formats
+
+    manufacturer_name:
+      type: language_dependent
+      value: null
+
+    product_name:
+      type: language_dependent
+      value: null
+
+    serial_number:
+      type: 6bit_ascii
+      value: null
+
+    part_number:
+      type: 6bit_ascii
+      value: null
+
+    fru_file_id:
+      type: binary_or_unspecified
+      value: null
+
+    custom_manufacturing_fields:
+    - type: binary_or_unspecified
+      value: 01 02 03 04 05 06 07 08 09
+
+    - type: bcd_plus
+      value: 123.324-123 234-123 # `0123456789 -.` only allowed
+
+    - type: 6bit_ascii
+      value: HELLO_WORLD
+
+    - type: language_dependent
+      value: some_english # it's illegal to use here anything, that can't be encoded with latin-1
+  product_info_area: null
+
+  # note: this field should be null instead of [], to support reproducibility
+  multirecord_area: null
